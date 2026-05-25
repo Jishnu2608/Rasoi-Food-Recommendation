@@ -21,6 +21,7 @@ export function buildAliasIndex(
 ): Map<string, AliasIndexEntry> {
   const map = new Map<string, AliasIndexEntry>();
   for (const row of aliases) {
+    if (map.has(row.alias)) continue;
     map.set(row.alias, {
       ingredient_id: row.ingredient_id,
       alias: row.alias,

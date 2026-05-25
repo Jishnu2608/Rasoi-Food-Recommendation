@@ -3,6 +3,16 @@ export const STAPLE_CANONICAL_NAMES = new Set([
   "salt",
   "cooking_oil",
   "water",
+  "cumin",
+  "turmeric",
+  "red_chili_powder",
+  "coriander_powder",
+  "garam_masala",
+  "mustard_seeds",
+  "asafoetida",
+  "ginger",
+  "garlic",
+  "green_chili",
 ]);
 
 export const DEFAULT_RECOMMENDATION_LIMIT = 20;

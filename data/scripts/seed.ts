@@ -8,7 +8,8 @@ import { join } from "path";
 import { createClient } from "@supabase/supabase-js";
 import { recipeCatalog, type SeedRecipe } from "../seeds/recipe-catalog";
 
-const root = join(process.cwd(), "data", "seeds");
+const seedRoot = join(process.cwd(), "data", "seeds");
+const generatedRoot = join(process.cwd(), "data", "generated");
 
 interface IngredientSeed {
   canonical_name: string;
@@ -17,6 +18,7 @@ interface IngredientSeed {
   category?: string;
   is_staple?: boolean;
   aliases?: string[];
+  source_aliases?: string[];
 }
 
 function loadIngredients(): {
@@ -28,8 +30,20 @@ function loadIngredients(): {
     confidence?: number;
   }[];
 } {
-  const raw = readFileSync(join(root, "ingredients.json"), "utf-8");
+  const raw = readFileSync(join(seedRoot, "ingredients.json"), "utf-8");
   return JSON.parse(raw);
+}
+
+function loadExpandedIngredients(): IngredientSeed[] {
+  const raw = readFileSync(join(generatedRoot, "expanded-ingredients.json"), "utf-8");
+  const parsed = JSON.parse(raw) as { ingredients?: IngredientSeed[] };
+  return parsed.ingredients ?? [];
+}
+
+function loadExpandedRecipes(): SeedRecipe[] {
+  const raw = readFileSync(join(generatedRoot, "expanded-recipes.json"), "utf-8");
+  const parsed = JSON.parse(raw) as { recipes?: SeedRecipe[] };
+  return parsed.recipes ?? [];
 }
 
 async function main() {
@@ -44,7 +58,9 @@ async function main() {
     auth: { persistSession: false },
   });
 
-  const { ingredients, substitutions } = loadIngredients();
+  const { ingredients: baseIngredients, substitutions } = loadIngredients();
+  const ingredients = [...baseIngredients, ...loadExpandedIngredients()];
+  const recipes = [...recipeCatalog, ...loadExpandedRecipes()];
   const idByCanonical = new Map<string, string>();
 
   console.log("Seeding ingredients...");
@@ -70,6 +86,7 @@ async function main() {
       ing.canonical_name,
       ing.display_name_en.toLowerCase(),
       ...(ing.aliases ?? []),
+      ...(ing.source_aliases ?? []),
     ]);
     for (const alias of aliasSet) {
       const normalized = alias.trim().toLowerCase();
@@ -102,8 +119,8 @@ async function main() {
     );
   }
 
-  console.log(`Seeding ${recipeCatalog.length} recipes...`);
-  for (const recipe of recipeCatalog as SeedRecipe[]) {
+  console.log(`Seeding ${recipes.length} recipes...`);
+  for (const recipe of recipes as SeedRecipe[]) {
     const { data: row, error } = await supabase
       .from("recipes")
       .upsert(
@@ -119,6 +136,7 @@ async function main() {
           difficulty: recipe.difficulty,
           instructions: recipe.instructions,
           description: recipe.description ?? null,
+          source_url: recipe.source_url ?? null,
           homemade_score: recipe.homemade_score ?? 85,
           is_published: true,
         },

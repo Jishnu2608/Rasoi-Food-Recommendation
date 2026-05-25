@@ -1,13 +1,22 @@
 import Link from "next/link";
+import { ChefHat } from "lucide-react";
 
 export function Header() {
   return (
-    <header className="border-b border-border bg-card/80 backdrop-blur-sm">
-      <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight text-primary">
-          Rasoi
+    <header className="sticky top-0 z-20 border-b border-border bg-card/90 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-lg font-semibold tracking-tight text-primary"
+        >
+          <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <ChefHat className="h-5 w-5" />
+          </span>
+          <span>Rasoi</span>
         </Link>
-        <span className="text-xs text-muted-foreground">Ghar ka khana</span>
+        <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground">
+          Ghar ka khana
+        </span>
       </div>
     </header>
   );

@@ -33,6 +33,7 @@ export interface Recipe {
   difficulty: Difficulty;
   instructions: RecipeStep[];
   description: string | null;
+  source_url?: string | null;
   homemade_score: number;
   is_published: boolean;
 }

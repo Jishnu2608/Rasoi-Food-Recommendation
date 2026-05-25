@@ -3,7 +3,7 @@
 import { useParams, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { Clock, Leaf } from "lucide-react";
+import { Clock, ExternalLink, Leaf } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Recipe, RecipeIngredientRow, RecipeStep } from "@/lib/utils/types";
@@ -95,6 +95,14 @@ function RecipeDetailContent() {
         </div>
         {recipe.description && (
           <p className="mt-3 text-muted-foreground">{recipe.description}</p>
+        )}
+        {recipe.source_url && (
+          <Button variant="outline" size="sm" asChild className="mt-4">
+            <a href={recipe.source_url} target="_blank" rel="noreferrer">
+              <ExternalLink className="h-4 w-4" />
+              Original recipe source
+            </a>
+          </Button>
         )}
       </div>
 

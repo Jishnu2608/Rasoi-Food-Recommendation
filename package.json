@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx data/scripts/seed.ts",
+    "recipes:import": "tsx data/scripts/import-expanded-recipes.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

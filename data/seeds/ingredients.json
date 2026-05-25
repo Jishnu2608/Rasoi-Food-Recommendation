@@ -1,7 +1,7 @@
 {
   "ingredients": [
     { "canonical_name": "salt", "display_name_en": "Salt", "display_name_hi": "Namak", "category": "staple", "is_staple": true, "aliases": ["namak", "noon"] },
-    { "canonical_name": "cooking_oil", "display_name_en": "Cooking oil", "display_name_hi": "Tel", "category": "staple", "is_staple": true, "aliases": ["tel", "oil", "sarson oil", "mustard oil"] },
+    { "canonical_name": "cooking_oil", "display_name_en": "Cooking oil", "display_name_hi": "Tel", "category": "staple", "is_staple": true, "aliases": ["tel", "oil"] },
     { "canonical_name": "water", "display_name_en": "Water", "display_name_hi": "Pani", "category": "staple", "is_staple": true, "aliases": ["pani"] },
     { "canonical_name": "potato", "display_name_en": "Potato", "display_name_hi": "Aloo", "category": "vegetable", "aliases": ["aloo", "batata"] },
     { "canonical_name": "onion", "display_name_en": "Onion", "display_name_hi": "Pyaz", "category": "vegetable", "aliases": ["pyaz", "kanda", "piyaz"] },
@@ -49,7 +49,7 @@
     { "canonical_name": "sugar", "display_name_en": "Sugar", "display_name_hi": "Cheeni", "category": "staple", "aliases": ["cheeni", "shakkar"] },
     { "canonical_name": "semolina", "display_name_en": "Semolina", "display_name_hi": "Suji", "category": "grain", "aliases": ["suji", "rava"] },
     { "canonical_name": "poha", "display_name_en": "Flattened rice", "display_name_hi": "Poha", "category": "grain", "aliases": ["flattened rice", "chivda poha"] },
-    { "canonical_name": "mustard_oil", "display_name_en": "Mustard oil", "display_name_hi": "Sarson ka tel", "category": "staple", "aliases": ["sarson ka tel"] },
+    { "canonical_name": "mustard_oil", "display_name_en": "Mustard oil", "display_name_hi": "Sarson ka tel", "category": "staple", "aliases": ["sarson ka tel", "sarson oil", "mustard oil"] },
     { "canonical_name": "tamarind", "display_name_en": "Tamarind", "display_name_hi": "Imli", "category": "spice", "aliases": ["imli"] },
     { "canonical_name": "curry_leaves", "display_name_en": "Curry leaves", "display_name_hi": "Kadi patta", "category": "herb", "aliases": ["kadi patta", "curry leaves"] },
     { "canonical_name": "coconut", "display_name_en": "Coconut", "display_name_hi": "Nariyal", "category": "other", "aliases": ["nariyal", "copra"] },

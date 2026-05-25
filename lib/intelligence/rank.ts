@@ -4,6 +4,9 @@ export function rankRecommendations(
   results: RecommendationResult[],
 ): RecommendationResult[] {
   return [...results].sort((a, b) => {
+    if (a.matched.length !== b.matched.length) {
+      return b.matched.length - a.matched.length;
+    }
     if (a.can_cook_now !== b.can_cook_now) {
       return a.can_cook_now ? -1 : 1;
     }

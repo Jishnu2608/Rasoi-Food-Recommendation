@@ -1,14 +1,16 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { ArrowLeft, CheckCircle2, Loader2, SearchX, ShoppingBasket } from "lucide-react";
 import { RecipeCard } from "@/components/recipes/recipe-card";
 import type {
   IngredientRef,
   RecommendationResult,
 } from "@/lib/utils/types";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 function RecommendContent() {
   const searchParams = useSearchParams();
@@ -27,7 +29,10 @@ function RecommendContent() {
       return;
     }
 
-    const ingredients = q.split(",").map((s) => decodeURIComponent(s.trim())).filter(Boolean);
+    const ingredients = q
+      .split(",")
+      .map((s) => decodeURIComponent(s.trim()))
+      .filter(Boolean);
 
     async function load() {
       setLoading(true);
@@ -66,7 +71,7 @@ function RecommendContent() {
           }
         }
       } catch {
-        setError("Network error. Check Supabase configuration.");
+        setError("Network error. Check the app configuration.");
       } finally {
         setLoading(false);
       }
@@ -76,16 +81,27 @@ function RecommendContent() {
   }, [q]);
 
   const pantryIds = pantry.map((p) => p.id).join(",");
+  const readyCount = useMemo(
+    () => results.filter((result) => result.can_cook_now).length,
+    [results],
+  );
 
   if (loading) {
-    return <p className="text-muted-foreground">Matching recipes…</p>;
+    return (
+      <div className="grid min-h-[360px] place-items-center rounded-lg border border-border bg-card">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          Matching recipes from your pantry...
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="space-y-4">
+      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
         <p className="text-red-700">{error}</p>
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild className="mt-4">
           <Link href="/">Back home</Link>
         </Button>
       </div>
@@ -94,48 +110,95 @@ function RecommendContent() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Aaj ke liye yeh dishes</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Using: {pantry.map((p) => p.display_name_en).join(", ") || "—"}
-        </p>
-        {unmatched.length > 0 && (
-          <p className="mt-1 text-sm text-amber-800">
-            Not recognized: {unmatched.join(", ")}
-          </p>
-        )}
-      </div>
+      <section className="rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-3">
+            <Button variant="ghost" size="sm" asChild className="-ml-2">
+              <Link href="/">
+                <ArrowLeft className="h-4 w-4" />
+                Change ingredients
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold">Aaj ke liye yeh dishes</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {results.length} matches from {pantry.length} recognized ingredients
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {pantry.map((p) => (
+                <Badge key={p.id} variant="secondary">
+                  {p.display_name_en}
+                </Badge>
+              ))}
+              {pantry.length === 0 && (
+                <span className="text-sm text-muted-foreground">No recognized pantry items</span>
+              )}
+            </div>
+            {unmatched.length > 0 && (
+              <p className="text-sm text-amber-800">
+                Not recognized: {unmatched.join(", ")}
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:min-w-64">
+            <div className="rounded-md border border-border bg-background p-3">
+              <p className="text-2xl font-bold text-primary">{readyCount}</p>
+              <p className="text-xs text-muted-foreground">ready now</p>
+            </div>
+            <div className="rounded-md border border-border bg-background p-3">
+              <p className="text-2xl font-bold text-primary">{results.length}</p>
+              <p className="text-xs text-muted-foreground">ranked ideas</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {explanation && (
-        <div className="rounded-xl border border-border bg-secondary/50 p-4 text-sm">
+        <div className="rounded-lg border border-border bg-secondary/50 p-4 text-sm leading-6 shadow-sm">
           {explanation}
         </div>
       )}
 
       {results.length === 0 ? (
-        <p className="text-muted-foreground">
-          No strong matches yet. Try more common ingredients or check spelling.
-        </p>
+        <div className="rounded-lg border border-dashed border-border bg-muted/50 p-8 text-center">
+          <SearchX className="mx-auto h-8 w-8 text-primary" />
+          <h2 className="mt-3 font-semibold">No recipe match yet</h2>
+          <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+            Try a common pantry item like aloo, rice, dahi, egg, onion, tomato,
+            or besan.
+          </p>
+        </div>
       ) : (
-        <ul className="space-y-3">
-          {results.map((r) => (
-            <li key={r.recipe.id}>
-              <RecipeCard result={r} pantryIds={pantryIds} />
-            </li>
-          ))}
-        </ul>
+        <>
+          {readyCount > 0 && (
+            <div className="flex items-center gap-2 text-sm font-medium text-green-900">
+              <CheckCircle2 className="h-4 w-4" />
+              Ready dishes are shown first, then close matches.
+            </div>
+          )}
+          <ul className="grid gap-4 md:grid-cols-2">
+            {results.map((r) => (
+              <li key={r.recipe.id}>
+                <RecipeCard result={r} pantryIds={pantryIds} />
+              </li>
+            ))}
+          </ul>
+        </>
       )}
 
-      <Button variant="ghost" asChild>
-        <Link href="/">← Change ingredients</Link>
-      </Button>
+      <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+        <ShoppingBasket className="h-4 w-4 text-primary" />
+        Missing items are shown so you can decide whether to substitute or skip.
+      </div>
     </div>
   );
 }
 
 export default function RecommendPage() {
   return (
-    <Suspense fallback={<p className="text-muted-foreground">Loading…</p>}>
+    <Suspense fallback={<p className="text-muted-foreground">Loading...</p>}>
       <RecommendContent />
     </Suspense>
   );

@@ -3,7 +3,6 @@ import { fetchRecipeBySlug, fetchSubstitutionRules } from "@/lib/db/queries";
 import { resolveSubstitutions } from "@/lib/intelligence/substitutions";
 import { scoreRecipe } from "@/lib/intelligence/score";
 import { toRecipeSummary } from "@/lib/intelligence/match";
-import { isSupabaseConfigured } from "@/lib/supabase/server";
 import type { IngredientRef } from "@/lib/utils/types";
 import { z } from "zod";
 
@@ -15,13 +14,6 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json(
-      { error: "Supabase is not configured." },
-      { status: 503 },
-    );
-  }
-
   const { slug } = await params;
   const { searchParams } = new URL(request.url);
   const parsed = querySchema.safeParse({

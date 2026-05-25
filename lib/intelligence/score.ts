@@ -25,6 +25,10 @@ function prepTimeWeight(minutes: number): number {
   return 0.2;
 }
 
+function homemadeWeight(score: number): number {
+  return score <= 10 ? score / 10 : score / 100;
+}
+
 function isStaple(ing: IngredientRef): boolean {
   return (
     ing.canonical_name !== undefined &&
@@ -83,7 +87,7 @@ export function scoreRecipe(input: RecipeMatchInput): {
   const missingPenalty = 0.12 * missing_required.length;
 
   const practicality =
-    0.08 * (recipe.homemade_score / 100) +
+    0.08 * homemadeWeight(recipe.homemade_score) +
     0.06 * difficultyWeight(recipe.difficulty) +
     0.05 * prepTimeWeight(recipe.prep_time_min);
 

@@ -10,6 +10,7 @@ export interface SeedRecipe {
   description?: string;
   homemade_score?: number;
   instructions: { step: number; text: string }[];
+  source_url?: string;
   ingredients: { canonical: string; required?: boolean; quantity?: string }[];
 }
 

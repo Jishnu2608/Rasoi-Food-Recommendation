@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { X } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+
 interface IngredientInputProps {
   onSubmit: (ingredients: string[]) => void;
   loading?: boolean;
@@ -71,33 +72,47 @@ export function IngredientInput({ onSubmit, loading }: IngredientInputProps) {
   };
 
   return (
-    <div className="w-full max-w-xl space-y-4">
+    <div className="w-full space-y-4">
       <div className="relative">
-        <Input
-          placeholder="Type ingredients — aloo, pyaz, tamatar…"
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-            void fetchSuggestions(e.target.value);
-          }}
-          onKeyDown={handleKeyDown}
-          disabled={loading}
-          aria-label="Ingredient input"
-        />
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="h-12 pl-10 pr-12 text-base shadow-inner"
+            placeholder="Type ingredients - aloo, pyaz, tamatar"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              void fetchSuggestions(e.target.value);
+            }}
+            onKeyDown={handleKeyDown}
+            disabled={loading}
+            aria-label="Ingredient input"
+          />
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md bg-primary text-primary-foreground transition hover:opacity-90 disabled:opacity-40"
+            onClick={() => addChip(value)}
+            disabled={loading || !value.trim()}
+            aria-label="Add ingredient"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
+
         {suggestions.length > 0 && (
           <ul
-            className="absolute z-10 mt-1 w-full rounded-lg border border-border bg-card py-1 shadow-md"
+            className="absolute z-10 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card py-1 shadow-lg"
             role="listbox"
           >
             {suggestions.map((s) => (
               <li key={s.alias}>
                 <button
                   type="button"
-                  className="w-full px-3 py-2 text-left text-sm hover:bg-muted"
+                  className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-muted"
                   onClick={() => addChip(s.alias)}
                 >
                   <span className="font-medium">{s.alias}</span>
-                  <span className="ml-2 text-muted-foreground">{s.display}</span>
+                  <span className="text-muted-foreground">{s.display}</span>
                 </button>
               </li>
             ))}
@@ -106,12 +121,12 @@ export function IngredientInput({ onSubmit, loading }: IngredientInputProps) {
       </div>
 
       {chips.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 rounded-lg border border-border bg-background p-3">
           {chips.map((chip) => (
             <Badge
               key={chip}
               variant="secondary"
-              className="gap-1 pr-1"
+              className="gap-1 border border-border bg-card pr-1"
             >
               {chip}
               <button
@@ -131,11 +146,11 @@ export function IngredientInput({ onSubmit, loading }: IngredientInputProps) {
 
       <Button
         size="lg"
-        className="w-full sm:w-auto"
+        className="w-full shadow-sm sm:w-auto"
         onClick={handleSubmit}
         disabled={loading || (chips.length === 0 && !value.trim())}
       >
-        {loading ? "Finding dishes…" : "Kya bana sakte hain?"}
+        {loading ? "Finding dishes..." : "Kya bana sakte hain?"}
       </Button>
     </div>
   );

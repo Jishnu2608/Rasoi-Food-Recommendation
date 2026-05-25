@@ -9,20 +9,12 @@ import {
   fetchCanonicalNameMap,
   logUnknownIngredient,
 } from "@/lib/db/queries";
-import { isSupabaseConfigured } from "@/lib/supabase/server";
 
 const bodySchema = z.object({
   ingredients: z.array(z.string()).min(1).max(30),
 });
 
 export async function POST(request: Request) {
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json(
-      { error: "Supabase is not configured. See README.md." },
-      { status: 503 },
-    );
-  }
-
   try {
     const json = await request.json();
     const { ingredients } = bodySchema.parse(json);

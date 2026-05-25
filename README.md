@@ -32,7 +32,9 @@ npm install
 npm run db:seed
 ```
 
-`db:seed` loads ~55 ingredients (with Hindi/regional aliases), substitution rules, and **102** pan-India home recipes.
+`db:seed` loads the curated seed catalog plus any generated catalog in `data/generated/`.
+This repo includes **102** hand-curated home recipes and can expand to **1600+**
+sourced Indian recipe entries after running `npm run recipes:import`.
 
 ### 4. Run locally
 
@@ -103,6 +105,17 @@ supabase/migrations/ # SQL schema
 
 Edit `data/seeds/recipe-catalog.ts` (use only canonical names from `data/seeds/ingredients.json`), then run `npm run db:seed` again.
 
+For a larger sourced catalog, run:
+
+```bash
+npm run recipes:import
+```
+
+This downloads `Anupam007/indian-recipe-dataset` from Hugging Face and writes
+normalized recipe/ingredient data into `data/generated/`. The dataset page has
+no explicit license, so generated entries keep original source URLs and do not
+copy full method text into the app.
+
 ## Scripts
 
 | Command        | Description              |
@@ -110,4 +123,5 @@ Edit `data/seeds/recipe-catalog.ts` (use only canonical names from `data/seeds/i
 | `npm run dev`  | Development server       |
 | `npm run build`| Production build         |
 | `npm run db:seed` | Load DB from seeds    |
+| `npm run recipes:import` | Generate expanded sourced catalog |
 | `npm run typecheck` | TypeScript check    |
