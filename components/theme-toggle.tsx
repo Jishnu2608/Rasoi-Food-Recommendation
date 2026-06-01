@@ -11,6 +11,7 @@ function applyTheme(theme: Theme) {
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("rasoi:theme") as Theme | null;
@@ -20,6 +21,7 @@ export function ThemeToggle() {
     const initial = stored ?? preferred;
     setTheme(initial);
     applyTheme(initial);
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
@@ -33,11 +35,15 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="grid h-9 w-9 place-items-center rounded-full border border-border bg-background/80 text-muted-foreground shadow-sm transition hover:text-foreground"
+      className="grid h-9 w-9 place-items-center rounded-full border border-border bg-background/80 text-muted-foreground shadow-sm transition hover:border-primary/45 hover:bg-muted hover:text-foreground"
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
       title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
-      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      {mounted && theme === "dark" ? (
+        <Sun className="h-4 w-4" />
+      ) : (
+        <Moon className="h-4 w-4" />
+      )}
     </button>
   );
 }

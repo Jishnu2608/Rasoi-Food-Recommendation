@@ -90,7 +90,7 @@ export default function HomePage() {
             <div className="rounded-[1.5rem] border border-border bg-background/86 p-3 shadow-sm sm:p-4">
               <IngredientInput onSubmit={handleSubmit} loading={loading} />
               {error && (
-                <p className="mt-4 text-sm text-red-700" role="alert">
+                <p className="mt-4 text-sm text-destructive" role="alert">
                   {error}
                 </p>
               )}
@@ -111,10 +111,10 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.5rem] border border-border bg-foreground p-5 text-primary-foreground shadow-sm sm:col-span-2">
+            <div className="rounded-[1.5rem] border border-border bg-strong p-5 text-strong-foreground shadow-sm sm:col-span-2">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm text-primary-foreground/70">Today mode</p>
+                  <p className="text-sm text-strong-foreground/70">Today mode</p>
                   <h2 className="mt-2 text-2xl font-semibold">From pantry to plate</h2>
                 </div>
                 <CookingPot className="h-7 w-7 text-accent" />
@@ -123,7 +123,7 @@ export default function HomePage() {
                 {highlights.map((item) => (
                   <div key={item.text} className="rounded-2xl bg-white/8 p-3">
                     <p className="text-xl font-semibold">{item.label}</p>
-                    <p className="mt-1 text-xs text-primary-foreground/65">{item.text}</p>
+                    <p className="mt-1 text-xs text-strong-foreground/65">{item.text}</p>
                   </div>
                 ))}
               </div>
@@ -134,7 +134,7 @@ export default function HomePage() {
               className="rounded-[1.5rem] border border-border bg-secondary/55 p-5 text-left transition hover:border-primary/50"
               onClick={() => handleSubmit(["rice", "egg", "onion", "tomato"])}
             >
-              <Leaf className="h-5 w-5 text-green-800" />
+              <Leaf className="h-5 w-5 text-success" />
               <h2 className="mt-4 font-semibold">Thicker search</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Rice, egg, onion, tomato ranks fuller meals over plain staples.
@@ -150,7 +150,7 @@ export default function HomePage() {
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Ready dishes, shorter prep, and easy methods get a quiet boost.
               </p>
-              <div className="mt-4 flex items-center gap-2 text-sm font-medium text-green-900">
+              <div className="mt-4 flex items-center gap-2 text-sm font-medium text-success">
                 <CheckCircle2 className="h-4 w-4" />
                 Built for weekday cooking
               </div>
@@ -161,15 +161,15 @@ export default function HomePage() {
 
       {starDish && (
         <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-[1.5rem] border border-border bg-foreground p-5 text-primary-foreground shadow-sm">
-            <div className="flex items-center gap-2 text-sm font-medium text-primary-foreground/75">
+          <div className="rounded-[1.5rem] border border-border bg-strong p-5 text-strong-foreground shadow-sm">
+            <div className="flex items-center gap-2 text-sm font-medium text-strong-foreground/75">
               <Star className="h-4 w-4 fill-accent text-accent" />
               Aaj Ki Star Dish
             </div>
             <h2 className="mt-4 text-2xl font-semibold leading-tight">
               {starDish.recipe.name}
             </h2>
-            <p className="mt-3 line-clamp-3 text-sm leading-6 text-primary-foreground/70">
+            <p className="mt-3 line-clamp-3 text-sm leading-6 text-strong-foreground/70">
               {starDish.description ??
                 "A daily pick from Rasoi's Indian recipe catalog."}
             </p>

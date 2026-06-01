@@ -131,7 +131,7 @@ export function IngredientInput({ onSubmit, loading }: IngredientInputProps) {
               {chip}
               <button
                 type="button"
-                className="rounded-full p-0.5 hover:bg-black/10"
+                className="rounded-full p-0.5 transition hover:bg-muted"
                 onClick={() =>
                   setChips((prev) => prev.filter((c) => c !== chip))
                 }

@@ -1,78 +1,191 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #faf6f0;
-  --color-foreground: #3d2914;
-  --color-card: #fffdf9;
-  --color-card-foreground: #3d2914;
-  --color-primary: #c45c26;
-  --color-primary-foreground: #fffdf9;
-  --color-secondary: #e8d4a8;
-  --color-secondary-foreground: #3d2914;
-  --color-muted: #f0e6d6;
-  --color-muted-foreground: #6b5344;
-  --color-accent: #d4a017;
-  --color-accent-foreground: #3d2914;
-  --color-border: #e5d5c0;
-  --color-input: #e5d5c0;
-  --color-ring: #c45c26;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-strong: var(--strong);
+  --color-strong-foreground: var(--strong-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-muted: var(--success-muted);
+  --color-warning: var(--warning);
+  --color-warning-muted: var(--warning-muted);
+  --color-destructive: var(--destructive);
+  --color-destructive-muted: var(--destructive-muted);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
 }
 
 :root {
   color-scheme: light;
+
+  /* Base */
+  --background: #f8f6f1;
+  --foreground: #31372f;
+
+  /* Cards */
+  --card: #fdfcf8;
+  --card-foreground: #31372f;
+
+  /* Brand */
+  --primary: #d97706;
+  --primary-foreground: #ffffff;
+
+  /* Secondary */
+  --secondary: #e6ece3;
+  --secondary-foreground: #445144;
+
+  /* Muted */
+  --muted: #eef1eb;
+  --muted-foreground: #69736b;
+
+  /* Accent */
+  --accent: #eab308;
+  --accent-foreground: #2f342d;
+
+  /* Strong */
+  --strong: #3b4339;
+  --strong-foreground: #ffffff;
+
+  /* Success */
+  --success: #6b8f71;
+  --success-foreground: #ffffff;
+  --success-muted: #e9f1ea;
+
+  /* Warning */
+  --warning: #c98b1d;
+  --warning-muted: #fbf2dc;
+
+  /* Error */
+  --destructive: #c65d4b;
+  --destructive-muted: #fae7e3;
+
+  /* Borders */
+  --border: #d9e0d5;
+  --input: #d9e0d5;
+  --ring: #d97706;
 }
 
 .dark {
   color-scheme: dark;
-  --color-background: #15110d;
-  --color-foreground: #f7ead8;
-  --color-card: #211914;
-  --color-card-foreground: #f7ead8;
-  --color-primary: #f08a4b;
-  --color-primary-foreground: #23140d;
-  --color-secondary: #47331f;
-  --color-secondary-foreground: #f7ead8;
-  --color-muted: #2d241c;
-  --color-muted-foreground: #cbb9a5;
-  --color-accent: #e4b94a;
-  --color-accent-foreground: #23140d;
-  --color-border: #3c3026;
-  --color-input: #49382b;
-  --color-ring: #f08a4b;
+
+  /* Base */
+  --background: #151a16;
+  --foreground: #f3f1eb;
+
+  /* Cards */
+  --card: #1d241f;
+  --card-foreground: #f3f1eb;
+
+  /* Brand */
+  --primary: #f0a54a;
+  --primary-foreground: #1d241f;
+
+  /* Secondary */
+  --secondary: #2a342d;
+  --secondary-foreground: #dfe8de;
+
+  /* Muted */
+  --muted: #232b26;
+  --muted-foreground: #aab5ad;
+
+  /* Accent */
+  --accent: #f4c95d;
+  --accent-foreground: #1d241f;
+
+  /* Strong */
+  --strong: #313b34;
+  --strong-foreground: #f3f1eb;
+
+  /* Success */
+  --success: #8db08f;
+  --success-foreground: #132016;
+  --success-muted: #243026;
+
+  /* Warning */
+  --warning: #e3b05a;
+  --warning-muted: #3a3321;
+
+  /* Error */
+  --destructive: #e08b80;
+  --destructive-muted: #39211f;
+
+  /* Borders */
+  --border: #323d35;
+  --input: #323d35;
+  --ring: #f0a54a;
+}
+
+html {
+  background: var(--background);
 }
 
 body {
-  background: var(--color-background);
+  background: var(--background);
   background-image:
-    radial-gradient(circle at 12% 0%, rgba(212, 160, 23, 0.18), transparent 28rem),
-    radial-gradient(circle at 88% 8%, rgba(196, 92, 38, 0.12), transparent 24rem),
-    linear-gradient(180deg, rgba(255, 253, 249, 0.86), rgba(250, 246, 240, 0.96)),
-    repeating-linear-gradient(
-      135deg,
-      rgba(196, 92, 38, 0.035) 0,
-      rgba(196, 92, 38, 0.035) 1px,
-      transparent 1px,
-      transparent 24px
+    radial-gradient(
+      circle at 15% 0%,
+      rgba(234, 179, 8, 0.10),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(217, 119, 6, 0.08),
+      transparent 24rem
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(107, 143, 113, 0.08),
+      transparent 32rem
+    ),
+    linear-gradient(
+      180deg,
+      rgba(253,252,248,0.96),
+      rgba(248,246,241,1)
     );
-  color: var(--color-foreground);
+
+  color: var(--foreground);
   font-family: var(--font-sans);
 }
 
 .dark body {
   background-image:
-    radial-gradient(circle at 12% 0%, rgba(228, 185, 74, 0.14), transparent 28rem),
-    radial-gradient(circle at 88% 8%, rgba(240, 138, 75, 0.13), transparent 24rem),
-    linear-gradient(180deg, rgba(21, 17, 13, 0.92), rgba(21, 17, 13, 0.98)),
-    repeating-linear-gradient(
-      135deg,
-      rgba(240, 138, 75, 0.035) 0,
-      rgba(240, 138, 75, 0.035) 1px,
-      transparent 1px,
-      transparent 24px
+    radial-gradient(
+      circle at 15% 0%,
+      rgba(244, 201, 93, 0.08),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(240, 165, 74, 0.07),
+      transparent 24rem
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(141, 176, 143, 0.05),
+      transparent 32rem
+    ),
+    linear-gradient(
+      180deg,
+      rgba(21,26,22,0.98),
+      rgba(17,21,18,1)
     );
 }
 
 ::selection {
-  background: rgba(196, 92, 38, 0.18);
+  background: rgba(217, 119, 6, 0.22);
+  color: inherit;
 }

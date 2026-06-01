@@ -44,7 +44,7 @@ export function RecipeCard({ result, pantryIds }: RecipeCardProps) {
             <Badge variant="outline">{missingCount} missing</Badge>
           )}
           {recipe.veg && (
-            <Badge variant="outline" className="gap-1 text-green-800">
+            <Badge variant="outline" className="gap-1 text-success">
               <Leaf className="h-3 w-3" /> Veg
             </Badge>
           )}

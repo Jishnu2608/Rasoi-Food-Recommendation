@@ -20,8 +20,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeScript = `
+    try {
+      const stored = localStorage.getItem("rasoi:theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (stored === "dark" || (!stored && prefersDark)) {
+        document.documentElement.classList.add("dark");
+      }
+    } catch {}
+  `;
+
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-screen antialiased">
         <Header />
         <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:py-8">

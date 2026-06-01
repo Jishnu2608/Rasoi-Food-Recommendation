@@ -100,7 +100,7 @@ function RecommendContent() {
   if (error) {
     return (
       <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm">
-        <p className="text-red-700">{error}</p>
+        <p className="text-destructive">{error}</p>
         <Button variant="outline" asChild className="mt-4">
           <Link href="/">Back home</Link>
         </Button>
@@ -140,7 +140,7 @@ function RecommendContent() {
               )}
             </div>
             {unmatched.length > 0 && (
-              <p className="text-sm text-amber-800">
+              <p className="text-sm text-warning">
                 Not recognized: {unmatched.join(", ")}
               </p>
             )}
@@ -177,7 +177,7 @@ function RecommendContent() {
       ) : (
         <>
           {readyCount > 0 && (
-            <div className="flex items-center gap-2 text-sm font-medium text-green-900">
+            <div className="flex items-center gap-2 text-sm font-medium text-success">
               <CheckCircle2 className="h-4 w-4" />
               Ready dishes are shown first, then close matches.
             </div>
