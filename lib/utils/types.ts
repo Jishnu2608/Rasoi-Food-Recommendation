@@ -34,8 +34,6 @@ export interface Recipe {
   instructions: RecipeStep[];
   description: string | null;
   source_url?: string | null;
-  youtube_video_id?: string | null;
-  youtube_url?: string | null;
   homemade_score: number;
   is_published: boolean;
 }

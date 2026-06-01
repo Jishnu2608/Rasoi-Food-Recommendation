@@ -19,6 +19,29 @@
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+  --color-background: #15110d;
+  --color-foreground: #f7ead8;
+  --color-card: #211914;
+  --color-card-foreground: #f7ead8;
+  --color-primary: #f08a4b;
+  --color-primary-foreground: #23140d;
+  --color-secondary: #47331f;
+  --color-secondary-foreground: #f7ead8;
+  --color-muted: #2d241c;
+  --color-muted-foreground: #cbb9a5;
+  --color-accent: #e4b94a;
+  --color-accent-foreground: #23140d;
+  --color-border: #3c3026;
+  --color-input: #49382b;
+  --color-ring: #f08a4b;
+}
+
 body {
   background: var(--color-background);
   background-image:
@@ -34,6 +57,20 @@ body {
     );
   color: var(--color-foreground);
   font-family: var(--font-sans);
+}
+
+.dark body {
+  background-image:
+    radial-gradient(circle at 12% 0%, rgba(228, 185, 74, 0.14), transparent 28rem),
+    radial-gradient(circle at 88% 8%, rgba(240, 138, 75, 0.13), transparent 24rem),
+    linear-gradient(180deg, rgba(21, 17, 13, 0.92), rgba(21, 17, 13, 0.98)),
+    repeating-linear-gradient(
+      135deg,
+      rgba(240, 138, 75, 0.035) 0,
+      rgba(240, 138, 75, 0.035) 1px,
+      transparent 1px,
+      transparent 24px
+    );
 }
 
 ::selection {

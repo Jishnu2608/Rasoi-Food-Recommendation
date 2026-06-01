@@ -1,15 +1,15 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
+  BookOpenText,
   Clock,
   ExternalLink,
   Leaf,
   Loader2,
-  PlayCircle,
   ShieldCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -34,17 +34,6 @@ interface RecipeDetailResponse {
   }[];
 }
 
-interface VideoState {
-  enabled: boolean;
-  videoId?: string;
-  title?: string | null;
-  channelTitle?: string | null;
-  embedUrl?: string;
-  watchUrl?: string;
-  searchUrl: string;
-  query: string;
-}
-
 function RecipeDetailContent() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -52,8 +41,6 @@ function RecipeDetailContent() {
   const pantry = searchParams.get("pantry") ?? "";
 
   const [data, setData] = useState<RecipeDetailResponse | null>(null);
-  const [video, setVideo] = useState<VideoState | null>(null);
-  const [videoLoading, setVideoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -69,40 +56,14 @@ function RecipeDetailContent() {
     void load();
   }, [slug, pantry]);
 
-  useEffect(() => {
-    if (!data?.recipe.name) return;
-
-    const recipeName = data.recipe.name;
-    const directVideoId = data.recipe.youtube_video_id;
-    const directUrl = data.recipe.youtube_url;
-    if (directVideoId) {
-      setVideo({
-        enabled: true,
-        videoId: directVideoId,
-        embedUrl: `https://www.youtube-nocookie.com/embed/${directVideoId}`,
-        watchUrl: directUrl ?? `https://www.youtube.com/watch?v=${directVideoId}`,
-        searchUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(
-          `${recipeName} recipe`,
-        )}`,
-        query: `${recipeName} recipe`,
-      });
-      return;
+  const sourceHost = useMemo(() => {
+    if (!data?.recipe.source_url) return null;
+    try {
+      return new URL(data.recipe.source_url).hostname.replace(/^www\./, "");
+    } catch {
+      return null;
     }
-
-    async function loadVideo() {
-      setVideoLoading(true);
-      try {
-        const res = await fetch(
-          `/api/youtube/recipe-video?q=${encodeURIComponent(recipeName)}`,
-        );
-        if (res.ok) setVideo(await res.json());
-      } finally {
-        setVideoLoading(false);
-      }
-    }
-
-    void loadVideo();
-  }, [data?.recipe.name, data?.recipe.youtube_video_id, data?.recipe.youtube_url]);
+  }, [data?.recipe.source_url]);
 
   if (error) {
     return (
@@ -128,6 +89,11 @@ function RecipeDetailContent() {
 
   const { recipe, ingredients, match, substitutions } = data;
   const steps = recipe.instructions as RecipeStep[];
+  const sourcedPlaceholder =
+    Boolean(recipe.source_url) &&
+    steps.some((step) =>
+      step.text.toLowerCase().includes("open the original source"),
+    );
 
   return (
     <article className="space-y-6">
@@ -174,17 +140,18 @@ function RecipeDetailContent() {
             <div className="rounded-[1.5rem] border border-border bg-background/80 p-4">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <ShieldCheck className="h-4 w-4 text-primary" />
-                Source handling
+                Method source
               </div>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Ingredients and matching stay in Rasoi. For externally sourced
-                recipes, full copyrighted method text is linked instead of copied.
+                Rasoi keeps ingredients and pantry matching in-app. When a
+                recipe comes from another publisher, the full method remains
+                with the original source to avoid copying copyrighted text.
               </p>
               {recipe.source_url && (
                 <Button variant="outline" size="sm" asChild className="mt-4 w-full">
                   <a href={recipe.source_url} target="_blank" rel="noreferrer">
                     <ExternalLink className="h-4 w-4" />
-                    Open original method
+                    Open {sourceHost ?? "source"} method
                   </a>
                 </Button>
               )}
@@ -193,7 +160,7 @@ function RecipeDetailContent() {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1fr_24rem]">
+      <section className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <div className="space-y-6">
           {match && (
             <section className="rounded-[1.5rem] border border-border bg-card/90 p-5 text-sm shadow-sm">
@@ -241,70 +208,36 @@ function RecipeDetailContent() {
               ))}
             </ul>
           </section>
-
-          <section className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
-            <h2 className="text-lg font-semibold">Method</h2>
-            <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm leading-7">
-              {steps.map((s) => (
-                <li key={s.step}>{s.text}</li>
-              ))}
-            </ol>
-          </section>
         </div>
 
         <aside className="space-y-4">
-          <section className="overflow-hidden rounded-[1.5rem] border border-border bg-card/90 shadow-sm">
-            <div className="border-b border-border p-4">
-              <div className="flex items-center gap-2 font-semibold">
-                <PlayCircle className="h-4 w-4 text-primary" />
-                Video guide
-              </div>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                Uses YouTube Data API when configured, ordered by view count.
-              </p>
+          <section className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
+            <div className="flex items-center gap-2 font-semibold">
+              <BookOpenText className="h-4 w-4 text-primary" />
+              Method
             </div>
-            {videoLoading ? (
-              <div className="grid aspect-video place-items-center text-sm text-muted-foreground">
-                Finding video...
-              </div>
-            ) : video?.videoId && video.embedUrl ? (
-              <div>
-                <iframe
-                  className="aspect-video w-full"
-                  src={video.embedUrl}
-                  title={video.title ?? `${recipe.name} video`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-                <div className="p-4">
-                  {video.title && <p className="text-sm font-medium">{video.title}</p>}
-                  {video.channelTitle && (
-                    <p className="mt-1 text-xs text-muted-foreground">{video.channelTitle}</p>
-                  )}
-                </div>
+            {sourcedPlaceholder ? (
+              <div className="mt-4 space-y-4">
+                <p className="text-sm leading-6 text-muted-foreground">
+                  This expanded-catalog recipe is sourced externally, so Rasoi
+                  shows the pantry-critical ingredient list here and routes you
+                  to the publisher for the full cooking steps.
+                </p>
+                {recipe.source_url && (
+                  <Button asChild className="w-full">
+                    <a href={recipe.source_url} target="_blank" rel="noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                      Read full method
+                    </a>
+                  </Button>
+                )}
               </div>
             ) : (
-              <div className="p-4">
-                <p className="text-sm leading-6 text-muted-foreground">
-                  Add `YOUTUBE_API_KEY` to embed the top view-count result here.
-                  Until then, open a prepared YouTube search.
-                </p>
-                <Button variant="outline" size="sm" asChild className="mt-4 w-full">
-                  <a
-                    href={
-                      video?.searchUrl ??
-                      `https://www.youtube.com/results?search_query=${encodeURIComponent(
-                        `${recipe.name} recipe`,
-                      )}`
-                    }
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Search YouTube
-                  </a>
-                </Button>
-              </div>
+              <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm leading-7">
+                {steps.map((s) => (
+                  <li key={s.step}>{s.text}</li>
+                ))}
+              </ol>
             )}
           </section>
         </aside>

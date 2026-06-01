@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChefHat, Sparkles } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Header() {
   return (
@@ -20,10 +21,13 @@ export function Header() {
             </span>
           </span>
         </Link>
-        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm">
-          <Sparkles className="h-3.5 w-3.5 text-accent" />
-          AI-native pantry match
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="hidden items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm sm:inline-flex">
+            <Sparkles className="h-3.5 w-3.5 text-accent" />
+            AI-native pantry match
+          </span>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

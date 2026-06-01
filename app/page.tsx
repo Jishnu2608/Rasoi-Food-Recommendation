@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -10,6 +10,7 @@ import {
   Leaf,
   Search,
   Sparkles,
+  Star,
 } from "lucide-react";
 import { IngredientInput } from "@/components/ingredients/ingredient-input";
 
@@ -20,10 +21,35 @@ const highlights = [
   { label: "20", text: "ranked ideas" },
 ];
 
+interface StarDish {
+  recipe: {
+    slug: string;
+    name: string;
+    region: string;
+    veg: boolean;
+    prep_time_min: number;
+  };
+  description: string | null;
+  ingredients: string[];
+}
+
 export default function HomePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [starDish, setStarDish] = useState<StarDish | null>(null);
+
+  useEffect(() => {
+    async function loadStarDish() {
+      try {
+        const res = await fetch("/api/todays-star");
+        if (res.ok) setStarDish(await res.json());
+      } catch {
+        setStarDish(null);
+      }
+    }
+    void loadStarDish();
+  }, []);
 
   const handleSubmit = async (ingredients: string[]) => {
     setLoading(true);
@@ -133,11 +159,63 @@ export default function HomePage() {
         </div>
       </section>
 
+      {starDish && (
+        <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-[1.5rem] border border-border bg-foreground p-5 text-primary-foreground shadow-sm">
+            <div className="flex items-center gap-2 text-sm font-medium text-primary-foreground/75">
+              <Star className="h-4 w-4 fill-accent text-accent" />
+              Aaj Ki Star Dish
+            </div>
+            <h2 className="mt-4 text-2xl font-semibold leading-tight">
+              {starDish.recipe.name}
+            </h2>
+            <p className="mt-3 line-clamp-3 text-sm leading-6 text-primary-foreground/70">
+              {starDish.description ??
+                "A daily pick from Rasoi's Indian recipe catalog."}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-white/10 px-2.5 py-1 capitalize">
+                {starDish.recipe.region.replace("_", " ")}
+              </span>
+              <span className="rounded-full bg-white/10 px-2.5 py-1">
+                {starDish.recipe.prep_time_min} min
+              </span>
+              <span className="rounded-full bg-white/10 px-2.5 py-1">
+                {starDish.recipe.veg ? "Veg" : "Non-veg"}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-accent"
+              onClick={() => router.push(`/recipe/${starDish.recipe.slug}`)}
+            >
+              Open star dish <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="rounded-[1.5rem] border border-border bg-card/85 p-5 shadow-sm">
+            <p className="text-sm font-medium text-muted-foreground">
+              Star pantry signals
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {starDish.ingredients.map((ingredient) => (
+                <span
+                  key={ingredient}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-sm"
+                >
+                  {ingredient}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="grid gap-3 md:grid-cols-3">
         {[
           ["Normalize", "Hindi, English, regional names, and fuzzy spellings."],
           ["Rank", "Uses pantry overlap, missing items, prep time, and staples."],
-          ["Cook", "Open the recipe, see ingredients, substitutions, and video help."],
+          ["Cook", "Open the recipe, see ingredients, substitutions, and method source."],
         ].map(([title, text]) => (
           <div key={title} className="rounded-[1.25rem] border border-border bg-card/80 p-5 shadow-sm">
             <Search className="h-4 w-4 text-primary" />

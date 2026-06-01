@@ -11,8 +11,6 @@ export interface SeedRecipe {
   homemade_score?: number;
   instructions: { step: number; text: string }[];
   source_url?: string;
-  youtube_video_id?: string;
-  youtube_url?: string;
   ingredients: { canonical: string; required?: boolean; quantity?: string }[];
 }
 
