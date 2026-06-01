@@ -15,11 +15,13 @@ import {
 import { IngredientInput } from "@/components/ingredients/ingredient-input";
 
 const sampleIngredients = ["aloo", "pyaz", "tamatar", "dahi", "chawal", "anda"];
-const highlights = [
-  { label: "1600+", text: "Indian dishes" },
-  { label: "700+", text: "ingredient names" },
-  { label: "20", text: "ranked ideas" },
-];
+
+function formatCount(value: number | null) {
+  if (value === null) return "...";
+  if (value >= 1000) return `${(Math.floor(value / 100) / 10).toFixed(1)}k+`;
+  if (value >= 100) return `${Math.floor(value / 100) * 100}+`;
+  return `${value}`;
+}
 
 interface StarDish {
   recipe: {
@@ -38,6 +40,13 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [starDish, setStarDish] = useState<StarDish | null>(null);
+  const [catalogStats, setCatalogStats] = useState<{
+    recipeCount: number | null;
+    ingredientCount: number | null;
+  }>({
+    recipeCount: null,
+    ingredientCount: null,
+  });
 
   useEffect(() => {
     async function loadStarDish() {
@@ -51,6 +60,26 @@ export default function HomePage() {
     void loadStarDish();
   }, []);
 
+  useEffect(() => {
+    async function loadCatalogStats() {
+      try {
+        const res = await fetch("/api/catalog/stats");
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          recipe_count?: number;
+          ingredient_count?: number;
+        };
+        setCatalogStats({
+          recipeCount: data.recipe_count ?? null,
+          ingredientCount: data.ingredient_count ?? null,
+        });
+      } catch {
+        setCatalogStats({ recipeCount: null, ingredientCount: null });
+      }
+    }
+    void loadCatalogStats();
+  }, []);
+
   const handleSubmit = async (ingredients: string[]) => {
     setLoading(true);
     setError(null);
@@ -62,6 +91,15 @@ export default function HomePage() {
       setLoading(false);
     }
   };
+
+  const highlights = [
+    { label: formatCount(catalogStats.recipeCount), text: "Indian dishes" },
+    {
+      label: formatCount(catalogStats.ingredientCount),
+      text: "ingredient names",
+    },
+    { label: "20", text: "ranked ideas" },
+  ];
 
   return (
     <div className="space-y-6">

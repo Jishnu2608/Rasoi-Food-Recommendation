@@ -1,22 +1,19 @@
 /**
  * Import a sourced Indian recipe catalog into data/generated.
  *
- * Source: https://huggingface.co/datasets/Anupam007/indian-recipe-dataset
- * The dataset is a CSV mirror of Indian recipes with names, ingredients,
- * cuisine/course metadata, and source URLs. The dataset page does not publish
- * a license, so this importer stores the dish identity, ingredient facts, and
- * source URL, while keeping exact method text at the original source.
+ * Source: local Archana's Kitchen CSV export.
+ * This importer stores dish identity, ingredient facts, metadata, and source
+ * URL, while keeping exact method text at the original source.
  */
-import { mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import ingredientsSeed from "../seeds/ingredients.json";
 import { recipeCatalog, type SeedRecipe } from "../seeds/recipe-catalog";
 
-const SOURCE_URL =
-  "https://huggingface.co/datasets/Anupam007/indian-recipe-dataset/resolve/main/Cleaned_Indian_Food_Dataset.csv";
-const SOURCE_PAGE =
-  "https://huggingface.co/datasets/Anupam007/indian-recipe-dataset";
-const TARGET_RECIPE_COUNT = Number(process.env.EXPANDED_RECIPE_TARGET ?? 1500);
+const SOURCE_CSV_PATH =
+  process.env.EXPANDED_RECIPE_CSV_PATH ??
+  "C:/Users/Jishnudeep/Downloads/6000+ Indian Food Recipes Dataset/6000+ Indian Food Recipes Dataset/IndianFoodDatasetCSV.csv";
+const SOURCE_PAGE = "Archana's Kitchen 6000+ Indian Food Recipes Dataset CSV";
 const generatedRoot = join(process.cwd(), "data", "generated");
 
 type Region = SeedRecipe["region"];
@@ -34,14 +31,19 @@ interface IngredientSeed {
 }
 
 interface RawRecipeRow {
+  Srno: string;
+  RecipeName: string;
   TranslatedRecipeName: string;
+  Ingredients: string;
   TranslatedIngredients: string;
+  PrepTimeInMins: string;
+  CookTimeInMins: string;
   TotalTimeInMins: string;
+  Servings: string;
   Cuisine: string;
   Course: string;
   Diet: string;
   URL: string;
-  "Cleaned-Ingredients": string;
 }
 
 function parseCsv(text: string): string[][] {
@@ -89,16 +91,21 @@ function parseCsv(text: string): string[][] {
 
 function toRecords(csv: string): RawRecipeRow[] {
   const [header, ...rows] = parseCsv(csv);
-  const index = new Map(header.map((name, i) => [name, i]));
+  const index = new Map(header.map((name, i) => [name.replace(/^\uFEFF/, ""), i]));
   return rows.map((row) => ({
+    Srno: row[index.get("Srno") ?? -1] ?? "",
+    RecipeName: row[index.get("RecipeName") ?? -1] ?? "",
     TranslatedRecipeName: row[index.get("TranslatedRecipeName") ?? -1] ?? "",
+    Ingredients: row[index.get("Ingredients") ?? -1] ?? "",
     TranslatedIngredients: row[index.get("TranslatedIngredients") ?? -1] ?? "",
+    PrepTimeInMins: row[index.get("PrepTimeInMins") ?? -1] ?? "",
+    CookTimeInMins: row[index.get("CookTimeInMins") ?? -1] ?? "",
     TotalTimeInMins: row[index.get("TotalTimeInMins") ?? -1] ?? "",
+    Servings: row[index.get("Servings") ?? -1] ?? "",
     Cuisine: row[index.get("Cuisine") ?? -1] ?? "",
     Course: row[index.get("Course") ?? -1] ?? "",
     Diet: row[index.get("Diet") ?? -1] ?? "",
     URL: row[index.get("URL") ?? -1] ?? "",
-    "Cleaned-Ingredients": row[index.get("Cleaned-Ingredients") ?? -1] ?? "",
   }));
 }
 
@@ -123,11 +130,12 @@ function normalizeText(value: string): string {
   return value
     .toLowerCase()
     .replace(/&/g, " and ")
+    .replace(/[\u00BC-\u00BE\u2150-\u215E\u2044]/g, " ")
     .replace(/\([^)]*\)/g, " ")
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\b\d+\b/g, " ")
     .replace(/\b(cup|cups|tablespoon|tablespoons|tbsp|teaspoon|teaspoons|tsp|grams|gram|kg|kilogram|liter|litre|ml|inch|inches|pinch|sprig|sprigs|piece|pieces)\b/g, " ")
-    .replace(/\b(finely|roughly|fresh|homemade|whole|split|dry|dried|small|big|large|medium|optional|required|for|to|taste|as|needed|chopped|sliced|grated|paste|puree|powdered|roasted|crushed|soaked|cooked|boiled|peeled|deseeded|seedless|thinly)\b/g, " ")
+    .replace(/\b(a|an|the|and|or|of|according|additional|approx|approximately|available|finely|roughly|fresh|homemade|whole|split|dry|dried|small|big|large|medium|optional|required|for|to|taste|as|needed|chopped|sliced|slivers|slivered|shredded|grated|paste|puree|powdered|roasted|crushed|soaked|cooked|boiled|peeled|deseeded|seedless|thinly|lightly|washed|cored|quartered|lengthwise|loosely|packed|garnish|garnishing)\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -141,11 +149,27 @@ function splitList(value: string): string[] {
 
 function stripIngredientLine(value: string): string {
   return value
-    .replace(/^\s*[\d\s./-]+/, "")
+    .replace(/^\s*[\d\s./\u00BC-\u00BE\u2150-\u215E\u2044-]+/, "")
     .replace(/^\s*(cup|cups|tablespoon|tablespoons|tbsp|teaspoon|teaspoons|tsp|grams|gram|kg|kilogram|liter|litre|ml|inch|inches|pinch|sprig|sprigs|piece|pieces)\b\s*/i, "")
     .replace(/\s+-\s+.*$/g, "")
     .replace(/\s+as\s+(required|needed|per taste).*$/i, "")
     .trim();
+}
+
+function shouldSkipIngredient(raw: string): boolean {
+  if (/[\u0900-\u097F]/.test(raw)) return false;
+
+  const normalized = normalizeText(raw);
+  if (!normalized || normalized.length < 2) return true;
+  if (/^\d+$/.test(normalized)) return true;
+  if (
+    /^(a|an|and|or|according|additional|approx|approximately|garnish|garnishing|optional|required|taste|needed|to|for)$/.test(
+      normalized,
+    )
+  ) {
+    return true;
+  }
+  return false;
 }
 
 function aliasVariants(alias: string): string[] {
@@ -260,14 +284,78 @@ function baseAliasIndex(): Map<string, string> {
 
 const aliasIndex = baseAliasIndex();
 
-function specialCanonical(normalized: string):
+function hindiCanonical(raw: string):
   | { canonical: string; display: string; category: string }
   | null {
+  const rules: [RegExp, string, string, string][] = [
+    [/नारियल/, "coconut", "Coconut", "fruit"],
+    [/चना दाल|चने की दाल/, "lentil_chana", "Chana dal", "pulse"],
+    [/मूंग दाल|मूंग/, "lentil_moong", "Moong dal", "pulse"],
+    [/मसूर दाल|मसूर/, "lentil_masoor", "Masoor dal", "pulse"],
+    [/उरद|उड़द/, "black_gram_urad", "Urad dal", "pulse"],
+    [/कुलीथ/, "horse-gram", "Horse gram", "pulse"],
+    [/बादाम/, "almond", "Almond", "fruit"],
+    [/हरी मिर्च|हरा मिर्च/, "green_chili", "Green chili", "vegetable"],
+    [/अदरक लहसुन/, "ginger_garlic_paste", "Ginger garlic paste", "spice"],
+    [/लाल मिर्च/, "red_chili_powder", "Red chili", "spice"],
+    [/अदरक/, "ginger", "Ginger", "vegetable"],
+    [/लहसुन/, "garlic", "Garlic", "vegetable"],
+    [/राइ|सरसों/, "mustard_seeds", "Mustard seeds", "spice"],
+    [/जीरा/, "cumin", "Cumin", "spice"],
+    [/धनिया पाउडर/, "coriander_powder", "Coriander powder", "spice"],
+    [/धनिये के बीज|धनिया के बीज/, "coriander_powder", "Coriander seeds", "spice"],
+    [/हरा धनिया/, "coriander_leaves", "Coriander leaves", "herb"],
+    [/हल्दी/, "turmeric", "Turmeric", "spice"],
+    [/हींग/, "asafoetida", "Asafoetida", "spice"],
+    [/गरम मसाला/, "garam_masala", "Garam masala", "spice"],
+    [/अमचूर/, "amchur", "Amchur", "spice"],
+    [/चाट मसाला/, "chaat-masala", "Chaat masala", "spice"],
+    [/मेथी/, "fenugreek-seeds", "Fenugreek seeds", "spice"],
+    [/कलोंजी/, "nigella-seeds", "Nigella seeds", "spice"],
+    [/सौंफ/, "fennel-seeds", "Fennel seeds", "spice"],
+    [/कढ़ी पत्ता|करी पत्ता/, "curry_leaves", "Curry leaves", "herb"],
+    [/नमक/, "salt", "Salt", "staple"],
+    [/पानी/, "water", "Water", "staple"],
+    [/तेल/, "cooking_oil", "Cooking oil", "staple"],
+    [/प्याज|प्याज़/, "onion", "Onion", "vegetable"],
+    [/टमाटर/, "tomato", "Tomato", "vegetable"],
+    [/गाजर/, "carrot", "Carrot", "vegetable"],
+    [/हरा मटर|हरे मटर|मटर/, "peas", "Green peas", "vegetable"],
+    [/शिमला मिर्च/, "capsicum", "Capsicum", "vegetable"],
+    [/पनीर/, "paneer", "Paneer", "dairy"],
+    [/अंडे|अंडा/, "egg", "Egg", "protein"],
+    [/चकुंदर/, "beetroot", "Beetroot", "vegetable"],
+    [/चिचिंदा/, "snake-gourd", "Snake gourd", "vegetable"],
+    [/नूडल्स/, "noodles", "Noodles", "grain"],
+    [/बीन्स/, "green-beans", "Green beans", "vegetable"],
+    [/सोया सॉस/, "soy-sauce", "Soy sauce", "condiment"],
+    [/सिरका/, "vinegar", "Vinegar", "condiment"],
+    [/शहद/, "honey", "Honey", "sweetener"],
+    [/दूध/, "milk", "Milk", "dairy"],
+    [/काली मिर्च/, "black-pepper", "Black pepper", "spice"],
+    [/कॉर्न फ्लौर|कॉर्न फ्लोर/, "corn-flour", "Corn flour", "grain"],
+  ];
+
+  for (const [pattern, canonical, display, category] of rules) {
+    if (pattern.test(raw)) return { canonical, display, category };
+  }
+  return null;
+}
+
+function specialCanonical(normalized: string, raw = normalized):
+  | { canonical: string; display: string; category: string }
+  | null {
+  const hindi = hindiCanonical(raw);
+  if (hindi) return hindi;
+
   if (/\b(paneer|cottage cheese)\b/.test(normalized)) {
     return { canonical: "paneer", display: "Paneer", category: "dairy" };
   }
   if (/\b(tomato|tomatoes)\b/.test(normalized)) {
     return { canonical: "tomato", display: "Tomato", category: "vegetable" };
+  }
+  if (/\b(onion|onions)\b/.test(normalized)) {
+    return { canonical: "onion", display: "Onion", category: "vegetable" };
   }
   if (/\b(ragi|finger millet|nachni|nagli)\b/.test(normalized)) {
     return { canonical: "ragi", display: "Ragi / finger millet", category: "grain" };
@@ -288,7 +376,7 @@ function canonicalizeIngredient(raw: string): {
   category: string;
 } {
   const normalized = normalizeText(raw);
-  const special = specialCanonical(normalized);
+  const special = specialCanonical(normalized, raw);
   if (special) {
     return {
       canonical: special.canonical,
@@ -425,7 +513,7 @@ function mapDifficulty(minutes: number): Difficulty {
 }
 
 function isVeg(row: RawRecipeRow): boolean {
-  const text = `${row.Diet} ${row.TranslatedRecipeName} ${row["Cleaned-Ingredients"]}`.toLowerCase();
+  const text = `${row.Diet} ${row.TranslatedRecipeName} ${row.TranslatedIngredients}`.toLowerCase();
   if (/(non vegetarian|non-vegetarian|chicken|fish|mutton|prawn|shrimp|egg|meat|keema)/.test(text)) {
     return false;
   }
@@ -441,12 +529,37 @@ function cleanRecipeName(name: string): string {
     .trim();
 }
 
-async function fetchCsv(): Promise<string> {
-  const response = await fetch(SOURCE_URL);
-  if (!response.ok) {
-    throw new Error(`Dataset download failed: ${response.status}`);
+function uniqueSlug(baseSlug: string, row: RawRecipeRow, existingSlugs: Set<string>) {
+  if (!existingSlugs.has(baseSlug)) return baseSlug;
+
+  const sourceId = row.Srno ? `archana-${row.Srno}` : "archana";
+  let candidate = `${baseSlug}-${sourceId}`;
+  let counter = 2;
+  while (existingSlugs.has(candidate)) {
+    candidate = `${baseSlug}-${sourceId}-${counter}`;
+    counter += 1;
   }
-  return response.text();
+  return candidate;
+}
+
+function totalMinutes(row: RawRecipeRow): number {
+  const total = Number.parseInt(row.TotalTimeInMins, 10);
+  if (Number.isFinite(total) && total > 0) return total;
+
+  const prep = Number.parseInt(row.PrepTimeInMins, 10);
+  const cook = Number.parseInt(row.CookTimeInMins, 10);
+  const fallback =
+    (Number.isFinite(prep) && prep > 0 ? prep : 0) +
+    (Number.isFinite(cook) && cook > 0 ? cook : 0);
+  return fallback > 0 ? fallback : 30;
+}
+
+function sourceHost(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "source";
+  }
 }
 
 function buildRecipe(
@@ -455,22 +568,23 @@ function buildRecipe(
   ingredientOutput: Map<string, IngredientSeed>,
 ): SeedRecipe | null {
   const sourceIngredientLines = splitList(row.TranslatedIngredients);
-  const cleanedIngredients = splitList(row["Cleaned-Ingredients"]);
-  const ingredientLines =
-    sourceIngredientLines.length >= 3 ? sourceIngredientLines : cleanedIngredients;
+  const fallbackIngredientLines = splitList(row.Ingredients);
+  const ingredientLines = sourceIngredientLines.length > 0 ? sourceIngredientLines : fallbackIngredientLines;
 
-  if (!row.TranslatedRecipeName || ingredientLines.length < 3 || !row.URL) {
+  if (!row.TranslatedRecipeName || ingredientLines.length === 0 || !row.URL) {
     return null;
   }
 
   const name = cleanRecipeName(row.TranslatedRecipeName);
   const baseSlug = slugify(name);
-  if (!baseSlug || existingSlugs.has(baseSlug)) return null;
-  existingSlugs.add(baseSlug);
+  if (!baseSlug) return null;
+  const slug = uniqueSlug(baseSlug, row, existingSlugs);
+  existingSlugs.add(slug);
 
   const seenIngredients = new Set<string>();
   const ingredients = ingredientLines.flatMap((line) => {
     const raw = stripIngredientLine(line);
+    if (shouldSkipIngredient(raw)) return [];
     const mapped = canonicalizeIngredient(raw);
     if (!mapped.canonical || seenIngredients.has(mapped.canonical)) return [];
     seenIngredients.add(mapped.canonical);
@@ -504,21 +618,20 @@ function buildRecipe(
     };
   });
 
-  if (ingredients.length < 3) return null;
+  if (ingredients.length === 0) return null;
 
-  const totalMinutes = Number.parseInt(row.TotalTimeInMins, 10);
-  const prepTime = Number.isFinite(totalMinutes) && totalMinutes > 0 ? totalMinutes : 30;
-  const sourceHost = new URL(row.URL).hostname.replace(/^www\./, "");
+  const prepTime = totalMinutes(row);
+  const host = sourceHost(row.URL);
 
   return {
-    slug: baseSlug,
+    slug,
     name,
     region: mapRegion(row.Cuisine),
     meal_type: mapMealType(row.Course),
     veg: isVeg(row),
     prep_time_min: Math.min(prepTime, 720),
     difficulty: mapDifficulty(prepTime),
-    description: `${row.Cuisine || "Indian"}${row.Course ? ` ${row.Course}` : ""}. Sourced from ${sourceHost}.`,
+    description: `${row.Cuisine || "Indian"}${row.Course ? ` ${row.Course}` : ""}. Sourced from ${host}.`,
     homemade_score: 7,
     source_url: row.URL,
     instructions: [
@@ -538,25 +651,25 @@ function buildRecipe(
 async function main() {
   mkdirSync(generatedRoot, { recursive: true });
 
-  console.log(`Downloading ${SOURCE_PAGE}`);
-  const csv = await fetchCsv();
+  if (!existsSync(SOURCE_CSV_PATH)) {
+    throw new Error(`Recipe CSV not found at ${SOURCE_CSV_PATH}`);
+  }
+
+  console.log(`Reading ${SOURCE_CSV_PATH}`);
+  const csv = readFileSync(SOURCE_CSV_PATH, "utf-8");
   const rows = toRecords(csv);
   const existingSlugs = new Set(recipeCatalog.map((recipe) => recipe.slug));
   const generatedIngredients = new Map<string, IngredientSeed>();
   const recipes: SeedRecipe[] = [];
+  let skipped = 0;
 
   for (const row of rows) {
-    if (recipes.length >= TARGET_RECIPE_COUNT) break;
-    if (!isIndianCuisine(row.Cuisine)) continue;
-
     const recipe = buildRecipe(row, existingSlugs, generatedIngredients);
-    if (recipe) recipes.push(recipe);
-  }
-
-  if (recipes.length < TARGET_RECIPE_COUNT) {
-    throw new Error(
-      `Only imported ${recipes.length} recipes; target was ${TARGET_RECIPE_COUNT}`,
-    );
+    if (recipe) {
+      recipes.push(recipe);
+    } else {
+      skipped += 1;
+    }
   }
 
   const generatedAt = new Date().toISOString();
@@ -568,10 +681,10 @@ async function main() {
     `${JSON.stringify(
       {
         source: SOURCE_PAGE,
-        source_file: SOURCE_URL,
+        source_file: SOURCE_CSV_PATH,
         generated_at: generatedAt,
         note:
-          "Recipe names, ingredient lists, metadata, and source URLs are imported from the sourced dataset. Exact method text remains at the original source URL.",
+          "Recipe names, ingredient lists, metadata, and source URLs are imported from the sourced CSV. Exact method text remains at the original source URL.",
         recipes,
       },
       null,
@@ -584,7 +697,7 @@ async function main() {
     `${JSON.stringify(
       {
         source: SOURCE_PAGE,
-        source_file: SOURCE_URL,
+        source_file: SOURCE_CSV_PATH,
         generated_at: generatedAt,
         ingredients: [...generatedIngredients.values()].sort((a, b) =>
           a.canonical_name.localeCompare(b.canonical_name),
@@ -596,6 +709,7 @@ async function main() {
   );
 
   console.log(`Imported ${recipes.length} recipes`);
+  console.log(`Skipped ${skipped} rows without enough usable recipe data`);
   console.log(`Added ${generatedIngredients.size} ingredient aliases/canonicals`);
   console.log(`Wrote ${recipeFile}`);
   console.log(`Wrote ${ingredientFile}`);
