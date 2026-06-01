@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Clock, Leaf, ListChecks } from "lucide-react";
+import { ArrowUpRight, Clock, Leaf, ListChecks, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { RecommendationResult } from "@/lib/utils/types";
 
@@ -16,21 +16,23 @@ export function RecipeCard({ result, pantryIds }: RecipeCardProps) {
   return (
     <Link
       href={`/recipe/${recipe.slug}?pantry=${pantryIds}`}
-      className="group block h-full rounded-lg border border-border bg-card p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+      className="group block h-full rounded-[1.5rem] border border-border bg-card/90 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/45 hover:shadow-md"
     >
       <div className="flex h-full flex-col gap-4">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="text-lg font-semibold leading-snug text-foreground">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+              <Sparkles className="h-3 w-3 text-accent" />
+              {matched.length} pantry hits
+            </div>
+            <h3 className="text-lg font-semibold leading-snug tracking-tight text-foreground">
               {recipe.name}
             </h3>
             {recipe.name_hi && (
-              <p className="mt-0.5 text-sm text-muted-foreground">
-                {recipe.name_hi}
-              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{recipe.name_hi}</p>
             )}
           </div>
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-muted text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-background text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
             <ArrowUpRight className="h-4 w-4" />
           </span>
         </div>
@@ -64,12 +66,11 @@ export function RecipeCard({ result, pantryIds }: RecipeCardProps) {
               <ListChecks className="h-3.5 w-3.5 text-primary" />
               {matchPercent}% match
             </span>
-            <span>{matched.length} pantry hits</span>
             <span className="capitalize">{recipe.region.replace("_", " ")}</span>
             <span className="capitalize">{recipe.difficulty}</span>
           </div>
           {missingCount > 0 && (
-            <p className="line-clamp-2 text-xs text-muted-foreground">
+            <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">
               Need: {missing_required.map((m) => m.display_name_en).join(", ")}
             </p>
           )}

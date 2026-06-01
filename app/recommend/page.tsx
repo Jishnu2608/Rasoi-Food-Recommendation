@@ -88,7 +88,7 @@ function RecommendContent() {
 
   if (loading) {
     return (
-      <div className="grid min-h-[360px] place-items-center rounded-lg border border-border bg-card">
+      <div className="grid min-h-[420px] place-items-center rounded-[2rem] border border-border bg-card/90">
         <div className="flex items-center gap-3 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
           Matching recipes from your pantry...
@@ -99,7 +99,7 @@ function RecommendContent() {
 
   if (error) {
     return (
-      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+      <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm">
         <p className="text-red-700">{error}</p>
         <Button variant="outline" asChild className="mt-4">
           <Link href="/">Back home</Link>
@@ -110,9 +110,10 @@ function RecommendContent() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-lg border border-border bg-card p-5 shadow-sm sm:p-6">
-        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-          <div className="space-y-3">
+      <section className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-sm sm:p-6">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
+        <div className="relative flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div className="space-y-4">
             <Button variant="ghost" size="sm" asChild className="-ml-2">
               <Link href="/">
                 <ArrowLeft className="h-4 w-4" />
@@ -120,14 +121,17 @@ function RecommendContent() {
               </Link>
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Aaj ke liye yeh dishes</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="text-sm font-medium text-primary">Rasoi ranked your pantry</p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+                Aaj ke liye yeh dishes
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
                 {results.length} matches from {pantry.length} recognized ingredients
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               {pantry.map((p) => (
-                <Badge key={p.id} variant="secondary">
+                <Badge key={p.id} variant="secondary" className="bg-background">
                   {p.display_name_en}
                 </Badge>
               ))}
@@ -142,13 +146,13 @@ function RecommendContent() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:min-w-64">
-            <div className="rounded-md border border-border bg-background p-3">
-              <p className="text-2xl font-bold text-primary">{readyCount}</p>
+          <div className="grid grid-cols-2 gap-3 sm:min-w-72">
+            <div className="rounded-[1.25rem] border border-border bg-background/85 p-4">
+              <p className="text-3xl font-semibold text-primary">{readyCount}</p>
               <p className="text-xs text-muted-foreground">ready now</p>
             </div>
-            <div className="rounded-md border border-border bg-background p-3">
-              <p className="text-2xl font-bold text-primary">{results.length}</p>
+            <div className="rounded-[1.25rem] border border-border bg-background/85 p-4">
+              <p className="text-3xl font-semibold text-primary">{results.length}</p>
               <p className="text-xs text-muted-foreground">ranked ideas</p>
             </div>
           </div>
@@ -156,13 +160,13 @@ function RecommendContent() {
       </section>
 
       {explanation && (
-        <div className="rounded-lg border border-border bg-secondary/50 p-4 text-sm leading-6 shadow-sm">
+        <div className="rounded-[1.5rem] border border-border bg-secondary/45 p-4 text-sm leading-6 shadow-sm">
           {explanation}
         </div>
       )}
 
       {results.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border bg-muted/50 p-8 text-center">
+        <div className="rounded-[2rem] border border-dashed border-border bg-muted/45 p-8 text-center">
           <SearchX className="mx-auto h-8 w-8 text-primary" />
           <h2 className="mt-3 font-semibold">No recipe match yet</h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
@@ -178,7 +182,7 @@ function RecommendContent() {
               Ready dishes are shown first, then close matches.
             </div>
           )}
-          <ul className="grid gap-4 md:grid-cols-2">
+          <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {results.map((r) => (
               <li key={r.recipe.id}>
                 <RecipeCard result={r} pantryIds={pantryIds} />
@@ -188,7 +192,7 @@ function RecommendContent() {
         </>
       )}
 
-      <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+      <div className="flex items-center gap-2 rounded-[1.25rem] border border-border bg-card/85 px-4 py-3 text-sm text-muted-foreground">
         <ShoppingBasket className="h-4 w-4 text-primary" />
         Missing items are shown so you can decide whether to substitute or skip.
       </div>

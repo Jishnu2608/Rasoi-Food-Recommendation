@@ -3,7 +3,15 @@
 import { useParams, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { Clock, ExternalLink, Leaf } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  ExternalLink,
+  Leaf,
+  Loader2,
+  PlayCircle,
+  ShieldCheck,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Recipe, RecipeIngredientRow, RecipeStep } from "@/lib/utils/types";
@@ -26,6 +34,17 @@ interface RecipeDetailResponse {
   }[];
 }
 
+interface VideoState {
+  enabled: boolean;
+  videoId?: string;
+  title?: string | null;
+  channelTitle?: string | null;
+  embedUrl?: string;
+  watchUrl?: string;
+  searchUrl: string;
+  query: string;
+}
+
 function RecipeDetailContent() {
   const params = useParams();
   const searchParams = useSearchParams();
@@ -33,6 +52,8 @@ function RecipeDetailContent() {
   const pantry = searchParams.get("pantry") ?? "";
 
   const [data, setData] = useState<RecipeDetailResponse | null>(null);
+  const [video, setVideo] = useState<VideoState | null>(null);
+  const [videoLoading, setVideoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,11 +69,46 @@ function RecipeDetailContent() {
     void load();
   }, [slug, pantry]);
 
+  useEffect(() => {
+    if (!data?.recipe.name) return;
+
+    const recipeName = data.recipe.name;
+    const directVideoId = data.recipe.youtube_video_id;
+    const directUrl = data.recipe.youtube_url;
+    if (directVideoId) {
+      setVideo({
+        enabled: true,
+        videoId: directVideoId,
+        embedUrl: `https://www.youtube-nocookie.com/embed/${directVideoId}`,
+        watchUrl: directUrl ?? `https://www.youtube.com/watch?v=${directVideoId}`,
+        searchUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(
+          `${recipeName} recipe`,
+        )}`,
+        query: `${recipeName} recipe`,
+      });
+      return;
+    }
+
+    async function loadVideo() {
+      setVideoLoading(true);
+      try {
+        const res = await fetch(
+          `/api/youtube/recipe-video?q=${encodeURIComponent(recipeName)}`,
+        );
+        if (res.ok) setVideo(await res.json());
+      } finally {
+        setVideoLoading(false);
+      }
+    }
+
+    void loadVideo();
+  }, [data?.recipe.name, data?.recipe.youtube_video_id, data?.recipe.youtube_url]);
+
   if (error) {
     return (
-      <div className="space-y-4">
+      <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm">
         <p>{error}</p>
-        <Button variant="outline" asChild>
+        <Button variant="outline" asChild className="mt-4">
           <Link href="/">Home</Link>
         </Button>
       </div>
@@ -60,103 +116,198 @@ function RecipeDetailContent() {
   }
 
   if (!data) {
-    return <p className="text-muted-foreground">Loading recipe…</p>;
+    return (
+      <div className="grid min-h-[360px] place-items-center rounded-[2rem] border border-border bg-card">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          Loading recipe...
+        </div>
+      </div>
+    );
   }
 
   const { recipe, ingredients, match, substitutions } = data;
   const steps = recipe.instructions as RecipeStep[];
 
   return (
-    <article className="space-y-8">
-      <div>
-        <Button variant="ghost" size="sm" asChild className="mb-2 -ml-2">
-          <Link href={pantry ? `/recommend?q=${encodeURIComponent(getLastQuery())}` : "/"}>
-            ← Back
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-bold">{recipe.name}</h1>
-        {recipe.name_hi && (
-          <p className="text-muted-foreground">{recipe.name_hi}</p>
-        )}
-        <div className="mt-3 flex flex-wrap gap-2">
-          {match?.can_cook_now && <Badge variant="success">Ready to cook</Badge>}
-          {recipe.veg && (
-            <Badge variant="outline" className="gap-1">
-              <Leaf className="h-3 w-3" /> Veg
-            </Badge>
-          )}
-          <Badge variant="secondary">
-            <Clock className="mr-1 inline h-3 w-3" />
-            {recipe.prep_time_min} min
-          </Badge>
-          <Badge variant="outline" className="capitalize">
-            {recipe.region.replace("_", " ")}
-          </Badge>
-        </div>
-        {recipe.description && (
-          <p className="mt-3 text-muted-foreground">{recipe.description}</p>
-        )}
-        {recipe.source_url && (
-          <Button variant="outline" size="sm" asChild className="mt-4">
-            <a href={recipe.source_url} target="_blank" rel="noreferrer">
-              <ExternalLink className="h-4 w-4" />
-              Original recipe source
-            </a>
+    <article className="space-y-6">
+      <section className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-sm sm:p-7">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
+        <div className="relative">
+          <Button variant="ghost" size="sm" asChild className="mb-4 -ml-2">
+            <Link href={pantry ? `/recommend?q=${encodeURIComponent(getLastQuery())}` : "/"}>
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Link>
           </Button>
-        )}
-      </div>
+          <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
+            <div>
+              <p className="text-sm font-medium text-primary">Recipe workspace</p>
+              <h1 className="mt-2 text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
+                {recipe.name}
+              </h1>
+              {recipe.name_hi && (
+                <p className="mt-2 text-muted-foreground">{recipe.name_hi}</p>
+              )}
+              {recipe.description && (
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  {recipe.description}
+                </p>
+              )}
+              <div className="mt-5 flex flex-wrap gap-2">
+                {match?.can_cook_now && <Badge variant="success">Ready to cook</Badge>}
+                {recipe.veg && (
+                  <Badge variant="outline" className="gap-1">
+                    <Leaf className="h-3 w-3" /> Veg
+                  </Badge>
+                )}
+                <Badge variant="secondary">
+                  <Clock className="mr-1 inline h-3 w-3" />
+                  {recipe.prep_time_min} min
+                </Badge>
+                <Badge variant="outline" className="capitalize">
+                  {recipe.region.replace("_", " ")}
+                </Badge>
+              </div>
+            </div>
 
-      {match && (
-        <section className="rounded-xl border border-border bg-muted/30 p-4 text-sm">
-          {!match.can_cook_now && match.missing_required.length > 0 && (
-            <p>
-              <span className="font-medium">Missing: </span>
-              {match.missing_required.map((m) => m.display_name_en).join(", ")}
-            </p>
+            <div className="rounded-[1.5rem] border border-border bg-background/80 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                Source handling
+              </div>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Ingredients and matching stay in Rasoi. For externally sourced
+                recipes, full copyrighted method text is linked instead of copied.
+              </p>
+              {recipe.source_url && (
+                <Button variant="outline" size="sm" asChild className="mt-4 w-full">
+                  <a href={recipe.source_url} target="_blank" rel="noreferrer">
+                    <ExternalLink className="h-4 w-4" />
+                    Open original method
+                  </a>
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[1fr_24rem]">
+        <div className="space-y-6">
+          {match && (
+            <section className="rounded-[1.5rem] border border-border bg-card/90 p-5 text-sm shadow-sm">
+              {!match.can_cook_now && match.missing_required.length > 0 && (
+                <p>
+                  <span className="font-medium">Missing: </span>
+                  {match.missing_required.map((m) => m.display_name_en).join(", ")}
+                </p>
+              )}
+              {match.assumed_staples.length > 0 && (
+                <p className="mt-1 text-muted-foreground">
+                  Assumed at home: {match.assumed_staples.join(", ")}
+                </p>
+              )}
+              {substitutions.length > 0 && (
+                <ul className="mt-3 space-y-1">
+                  {substitutions.map((s, i) => (
+                    <li key={i}>
+                      Use <strong>{s.substitute.display_name_en}</strong> instead of{" "}
+                      {s.missing.display_name_en}
+                      {s.ratio_note && ` - ${s.ratio_note}`}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
           )}
-          {match.assumed_staples.length > 0 && (
-            <p className="mt-1 text-muted-foreground">
-              Assumed at home: {match.assumed_staples.join(", ")}
-            </p>
-          )}
-          {substitutions.length > 0 && (
-            <ul className="mt-2 space-y-1">
-              {substitutions.map((s, i) => (
-                <li key={i}>
-                  Use <strong>{s.substitute.display_name_en}</strong> instead of{" "}
-                  {s.missing.display_name_en}
-                  {s.ratio_note && ` — ${s.ratio_note}`}
+
+          <section className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
+            <h2 className="text-lg font-semibold">Ingredients</h2>
+            <ul className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+              {ingredients.map((row) => (
+                <li
+                  key={row.id}
+                  className="rounded-2xl border border-border bg-background/80 px-3 py-2"
+                >
+                  <span className="font-medium">{row.ingredient.display_name_en}</span>
+                  {row.quantity_text && (
+                    <span className="ml-1 text-muted-foreground">({row.quantity_text})</span>
+                  )}
+                  {!row.is_required && (
+                    <span className="ml-1 text-xs text-muted-foreground">(optional)</span>
+                  )}
                 </li>
               ))}
             </ul>
-          )}
-        </section>
-      )}
+          </section>
 
-      <section>
-        <h2 className="text-lg font-semibold">Ingredients</h2>
-        <ul className="mt-2 space-y-1 text-sm">
-          {ingredients.map((row) => (
-            <li key={row.id} className="flex gap-2">
-              <span>{row.ingredient.display_name_en}</span>
-              {row.quantity_text && (
-                <span className="text-muted-foreground">({row.quantity_text})</span>
-              )}
-              {!row.is_required && (
-                <span className="text-xs text-muted-foreground">(optional)</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
+          <section className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
+            <h2 className="text-lg font-semibold">Method</h2>
+            <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm leading-7">
+              {steps.map((s) => (
+                <li key={s.step}>{s.text}</li>
+              ))}
+            </ol>
+          </section>
+        </div>
 
-      <section>
-        <h2 className="text-lg font-semibold">Method</h2>
-        <ol className="mt-2 list-decimal space-y-3 pl-5 text-sm leading-relaxed">
-          {steps.map((s) => (
-            <li key={s.step}>{s.text}</li>
-          ))}
-        </ol>
+        <aside className="space-y-4">
+          <section className="overflow-hidden rounded-[1.5rem] border border-border bg-card/90 shadow-sm">
+            <div className="border-b border-border p-4">
+              <div className="flex items-center gap-2 font-semibold">
+                <PlayCircle className="h-4 w-4 text-primary" />
+                Video guide
+              </div>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Uses YouTube Data API when configured, ordered by view count.
+              </p>
+            </div>
+            {videoLoading ? (
+              <div className="grid aspect-video place-items-center text-sm text-muted-foreground">
+                Finding video...
+              </div>
+            ) : video?.videoId && video.embedUrl ? (
+              <div>
+                <iframe
+                  className="aspect-video w-full"
+                  src={video.embedUrl}
+                  title={video.title ?? `${recipe.name} video`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+                <div className="p-4">
+                  {video.title && <p className="text-sm font-medium">{video.title}</p>}
+                  {video.channelTitle && (
+                    <p className="mt-1 text-xs text-muted-foreground">{video.channelTitle}</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="p-4">
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Add `YOUTUBE_API_KEY` to embed the top view-count result here.
+                  Until then, open a prepared YouTube search.
+                </p>
+                <Button variant="outline" size="sm" asChild className="mt-4 w-full">
+                  <a
+                    href={
+                      video?.searchUrl ??
+                      `https://www.youtube.com/results?search_query=${encodeURIComponent(
+                        `${recipe.name} recipe`,
+                      )}`
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Search YouTube
+                  </a>
+                </Button>
+              </div>
+            )}
+          </section>
+        </aside>
       </section>
     </article>
   );
@@ -176,7 +327,7 @@ function getLastQuery(): string {
 
 export default function RecipePage() {
   return (
-    <Suspense fallback={<p className="text-muted-foreground">Loading…</p>}>
+    <Suspense fallback={<p className="text-muted-foreground">Loading...</p>}>
       <RecipeDetailContent />
     </Suspense>
   );

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rasoi">
+  <rect width="64" height="64" rx="15" fill="#fffdf9"/>
+  <path d="M12 44h40v4a5 5 0 0 1-5 5H17a5 5 0 0 1-5-5z" fill="#3d2914"/>
+  <path d="M18 23h28a9 9 0 0 1 9 9v2H9v-2a9 9 0 0 1 9-9z" fill="#c45c26"/>
+  <path d="M19 23c1-7 6-12 13-12s12 5 13 12" fill="none" stroke="#3d2914" stroke-width="5" stroke-linecap="round"/>
+  <path d="M22 34c5 4 15 4 20 0" fill="none" stroke="#e8d4a8" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="25" cy="30" r="2" fill="#fffdf9"/>
+  <circle cx="39" cy="30" r="2" fill="#fffdf9"/>
+</svg>

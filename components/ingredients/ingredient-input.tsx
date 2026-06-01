@@ -77,7 +77,7 @@ export function IngredientInput({ onSubmit, loading }: IngredientInputProps) {
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            className="h-12 pl-10 pr-12 text-base shadow-inner"
+            className="h-14 rounded-[1.2rem] border-border bg-card/95 pl-10 pr-12 text-base shadow-sm"
             placeholder="Type ingredients - aloo, pyaz, tamatar"
             value={value}
             onChange={(e) => {
@@ -90,7 +90,7 @@ export function IngredientInput({ onSubmit, loading }: IngredientInputProps) {
           />
           <button
             type="button"
-            className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md bg-primary text-primary-foreground transition hover:opacity-90 disabled:opacity-40"
+            className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-2xl bg-primary text-primary-foreground transition hover:opacity-90 disabled:opacity-40"
             onClick={() => addChip(value)}
             disabled={loading || !value.trim()}
             aria-label="Add ingredient"
@@ -101,7 +101,7 @@ export function IngredientInput({ onSubmit, loading }: IngredientInputProps) {
 
         {suggestions.length > 0 && (
           <ul
-            className="absolute z-10 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card py-1 shadow-lg"
+            className="absolute z-10 mt-2 w-full overflow-hidden rounded-2xl border border-border bg-card py-1 shadow-lg"
             role="listbox"
           >
             {suggestions.map((s) => (
@@ -121,7 +121,7 @@ export function IngredientInput({ onSubmit, loading }: IngredientInputProps) {
       </div>
 
       {chips.length > 0 && (
-        <div className="flex flex-wrap gap-2 rounded-lg border border-border bg-background p-3">
+        <div className="flex flex-wrap gap-2 rounded-2xl border border-border bg-background/80 p-3">
           {chips.map((chip) => (
             <Badge
               key={chip}

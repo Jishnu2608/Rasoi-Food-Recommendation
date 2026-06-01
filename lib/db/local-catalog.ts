@@ -146,6 +146,8 @@ export function fetchLocalRecipesWithIngredients(): RecipeWithIngredients[] {
       instructions: seed.instructions,
       description: seed.description ?? null,
       source_url: seed.source_url ?? null,
+      youtube_video_id: seed.youtube_video_id ?? null,
+      youtube_url: seed.youtube_url ?? null,
       homemade_score: seed.homemade_score ?? 85,
       is_published: true,
     };
