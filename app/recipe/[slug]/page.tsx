@@ -137,7 +137,7 @@ function RecipeDetailContent() {
               </div>
             </div>
 
-            <div className="rounded-[1.5rem] border border-border bg-background/80 p-4">
+            {/* <div className="rounded-[1.5rem] border border-border bg-background/80 p-4">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <ShieldCheck className="h-4 w-4 text-primary" />
                 Method source
@@ -155,7 +155,7 @@ function RecipeDetailContent() {
                   </a>
                 </Button>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
