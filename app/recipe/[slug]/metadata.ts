@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: RecipeMetadataParams): Promis
     const recipe = data.recipe;
 
     const ingredients = data.ingredients
-      .map((i: any) => i.ingredient.display_name_en)
+      .map((i: { ingredient: { display_name_en: string } }) => i.ingredient.display_name_en)
       .slice(0, 5)
       .join(", ");
 
