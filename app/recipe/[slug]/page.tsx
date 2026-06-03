@@ -14,9 +14,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Recipe, RecipeIngredientRow, RecipeStep } from "@/lib/utils/types";
-import { generateMetadata } from "./metadata";
-
-export { generateMetadata };
 
 interface RecipeDetailResponse {
   recipe: Recipe;
