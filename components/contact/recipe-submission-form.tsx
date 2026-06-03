@@ -40,7 +40,7 @@ export function RecipeSubmissionForm() {
       } else {
         alert("Failed to submit recipe. Please try again.");
       }
-    } catch (error) {
+    } catch {
       alert("Failed to submit recipe. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -67,7 +67,7 @@ export function RecipeSubmissionForm() {
         </div>
         <h3 className="text-lg font-semibold">Recipe Submitted!</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          Thank you for sharing your recipe. We'll review it and add it to our collection.
+          Thank you for sharing your recipe. We&apos;ll review it and add it to our collection.
         </p>
         <Button
           onClick={() => setSubmitted(false)}
@@ -84,7 +84,7 @@ export function RecipeSubmissionForm() {
     <div className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
       <h3 className="text-lg font-semibold">Submit Your Recipe</h3>
       <p className="mt-2 text-sm text-muted-foreground">
-        Found a recipe that's not in our app? Share it with us!
+        Found a recipe that&apos;s not in our app? Share it with us!
       </p>
 
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
