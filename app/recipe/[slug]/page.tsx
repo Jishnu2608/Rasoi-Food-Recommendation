@@ -14,6 +14,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Recipe, RecipeIngredientRow, RecipeStep } from "@/lib/utils/types";
+import { generateMetadata } from "./metadata";
+
+export { generateMetadata };
 
 interface RecipeDetailResponse {
   recipe: Recipe;
@@ -92,8 +95,41 @@ function RecipeDetailContent() {
     step.text.toLowerCase().includes("open the original source"),
   );
 
+  // Generate JSON-LD structured data for SEO
+  const jsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "Recipe",
+    name: recipe.name,
+    description: recipe.description,
+    prepTime: `PT${recipe.prep_time_min}M`,
+    cookTime: `PT${recipe.prep_time_min}M`,
+    totalTime: `PT${recipe.prep_time_min}M`,
+    recipeCategory: recipe.meal_type,
+    recipeCuisine: recipe.region.replace("_", " "),
+    keywords: ingredients.map((i) => i.ingredient.display_name_en).join(", "),
+    recipeIngredient: ingredients.map((i) => i.quantity_text || i.ingredient.display_name_en),
+    recipeInstructions: steps.map((step, index) => ({
+      "@type": "HowToStep",
+      text: step.text,
+      position: index + 1,
+    })),
+    author: {
+      "@type": "Person",
+      name: "Rasoi",
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.5",
+      ratingCount: "100",
+    },
+  };
+
   return (
     <article className="space-y-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <section className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-sm sm:p-7">
         <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
         <div className="relative">

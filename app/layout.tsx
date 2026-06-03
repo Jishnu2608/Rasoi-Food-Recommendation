@@ -4,9 +4,62 @@ import { Footer } from "@/components/layout/footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Rasoi - Ghar ka khana from your kitchen",
+  title: {
+    default: "Rasoi - Ghar ka khana from your kitchen",
+    template: "%s | Rasoi",
+  },
   description:
-    "Enter what you have at home and get realistic homemade Indian dish recommendations.",
+    "Enter what you have at home and get realistic homemade Indian dish recommendations. Discover authentic Indian recipes based on ingredients you have in your pantry.",
+  keywords: [
+    "Indian recipes",
+    "cooking recipes",
+    "homemade Indian food",
+    "recipe recommendations",
+    "Indian cuisine",
+    "cooking ingredients",
+    "pantry recipes",
+    "Indian cooking",
+    "authentic Indian dishes",
+    "recipe finder",
+    "Indian food recipes",
+    "home cooking",
+    "kitchen recipes",
+    "cooking tips",
+  ],
+  authors: [{ name: "Jishnu" }],
+  creator: "Jishnudeep Borah",
+  publisher: "Rasoi",
+  metadataBase: new URL("https://rasoi-ready.vercel.app"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://rasoi-ready.vercel.app",
+    title: "Rasoi - Ghar ka khana from your kitchen",
+    description:
+      "Enter what you have at home and get realistic homemade Indian dish recommendations. Discover authentic Indian recipes based on ingredients you have in your pantry.",
+    siteName: "Rasoi",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rasoi - Ghar ka khana from your kitchen",
+    description:
+      "Enter what you have at home and get realistic homemade Indian dish recommendations. Discover authentic Indian recipes based on ingredients you have in your pantry.",
+    creator: "@JishnudeepBorah",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "XftyGEF4w023sM4Ow5OaFlNZGnXEx2p7Gr4FB2Z-VMY",
+  },
   manifest: "/site.webmanifest",
   icons: {
     icon: [
