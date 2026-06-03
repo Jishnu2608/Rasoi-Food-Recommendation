@@ -57,9 +57,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "XftyGEF4w023sM4Ow5OaFlNZGnXEx2p7Gr4FB2Z-VMY",
-  },
   manifest: "/site.webmanifest",
   icons: {
     icon: [
@@ -87,6 +84,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {process.env.GOOGLE_SITE_VERIFICATION && (
+          <meta
+            name="google-site-verification"
+            content={process.env.GOOGLE_SITE_VERIFICATION}
+          />
+        )}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-screen antialiased">
