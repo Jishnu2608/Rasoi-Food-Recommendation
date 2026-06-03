@@ -26,11 +26,20 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:py-12">
         <div className="grid gap-8 md:grid-cols-3">
           <div>
-            <h2 className="mt-4 font-semibold">Rasoi</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Ghar ka khana from your kitchen. Enter what you have at home and get realistic homemade Indian dish recommendations.
-            </p>
-          </div>
+          <Link
+            href="/"
+            className="group inline-block"
+          >
+            <h2 className="mt-4 font-semibold transition-colors group-hover:text-primary">
+              Rasoi
+            </h2>
+          </Link>
+
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Ghar ka khana from your kitchen. Enter what you have at home and get
+            realistic homemade Indian dish recommendations.
+          </p>
+        </div>
 
           <div>
             <h2 className="mt-4 font-semibold">Quick Links</h2>
