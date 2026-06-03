@@ -43,6 +43,8 @@ interface RawRecipeRow {
   Cuisine: string;
   Course: string;
   Diet: string;
+  Instructions: string;
+  TranslatedInstructions: string;
   URL: string;
 }
 
@@ -105,6 +107,8 @@ function toRecords(csv: string): RawRecipeRow[] {
     Cuisine: row[index.get("Cuisine") ?? -1] ?? "",
     Course: row[index.get("Course") ?? -1] ?? "",
     Diet: row[index.get("Diet") ?? -1] ?? "",
+    Instructions: row[index.get("Instructions") ?? -1] ?? "",
+    TranslatedInstructions: row[index.get("TranslatedInstructions") ?? -1] ?? "",
     URL: row[index.get("URL") ?? -1] ?? "",
   }));
 }
@@ -145,6 +149,37 @@ function splitList(value: string): string[] {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function splitInstructions(instructions: string): string[] {
+  if (!instructions || instructions.trim().length === 0) {
+    return [];
+  }
+
+  // Clean up the text - remove extra whitespace and special characters
+  const cleaned = instructions
+    .replace(/\s+/g, " ")
+    .replace(/\u00A0/g, " ") // Replace non-breaking spaces
+    .replace(/\uFEFF/g, "") // Remove BOM
+    .trim();
+
+  // Split by periods followed by space or capital letter (sentence boundaries)
+  const steps = cleaned
+    .split(/\. (?=[A-Z])/)
+    .map((step) => step.trim())
+    .filter((step) => step.length > 15) // Filter out very short fragments
+    .map((step) => step + "."); // Add period back
+
+  // If that didn't work well, try splitting by period
+  if (steps.length < 2) {
+    return cleaned
+      .split(".")
+      .map((step) => step.trim())
+      .filter((step) => step.length > 15)
+      .map((step) => step + ".");
+  }
+
+  return steps;
 }
 
 function stripIngredientLine(value: string): string {
@@ -623,6 +658,27 @@ function buildRecipe(
   const prepTime = totalMinutes(row);
   const host = sourceHost(row.URL);
 
+  // Parse instructions from the CSV
+  const instructionText = row.TranslatedInstructions || row.Instructions || "";
+  const instructionSteps = splitInstructions(instructionText);
+
+  // If we have actual instructions, use them; otherwise fall back to placeholder
+  const instructions = instructionSteps.length > 0
+    ? instructionSteps.map((text, index) => ({
+        step: index + 1,
+        text,
+      }))
+    : [
+        {
+          step: 1,
+          text: "This recommendation is based on a sourced Indian recipe entry and the ingredient list below.",
+        },
+        {
+          step: 2,
+          text: `Open the original source for the exact cooking method: ${row.URL}`,
+        },
+      ];
+
   return {
     slug,
     name,
@@ -634,16 +690,7 @@ function buildRecipe(
     description: `${row.Cuisine || "Indian"}${row.Course ? ` ${row.Course}` : ""}. Sourced from ${host}.`,
     homemade_score: 7,
     source_url: row.URL,
-    instructions: [
-      {
-        step: 1,
-        text: "This recommendation is based on a sourced Indian recipe entry and the ingredient list below.",
-      },
-      {
-        step: 2,
-        text: `Open the original source for the exact cooking method: ${row.URL}`,
-      },
-    ],
+    instructions,
     ingredients,
   };
 }

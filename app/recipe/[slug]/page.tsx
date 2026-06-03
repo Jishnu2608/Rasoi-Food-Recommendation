@@ -89,11 +89,9 @@ function RecipeDetailContent() {
 
   const { recipe, ingredients, match, substitutions } = data;
   const steps = recipe.instructions as RecipeStep[];
-  const sourcedPlaceholder =
-    Boolean(recipe.source_url) &&
-    steps.some((step) =>
-      step.text.toLowerCase().includes("open the original source"),
-    );
+  const hasRealInstructions = steps.length > 0 && !steps.some((step) =>
+    step.text.toLowerCase().includes("open the original source"),
+  );
 
   return (
     <article className="space-y-6">
@@ -208,15 +206,19 @@ function RecipeDetailContent() {
               ))}
             </ul>
           </section>
-        </div>
 
-        <aside className="space-y-4">
           <section className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
             <div className="flex items-center gap-2 font-semibold">
               <BookOpenText className="h-4 w-4 text-primary" />
               Method
             </div>
-            {sourcedPlaceholder ? (
+            {hasRealInstructions ? (
+              <ol className="mt-4 list-decimal space-y-4 pl-5 text-sm leading-7">
+                {steps.map((s) => (
+                  <li key={s.step} className="pl-2">{s.text}</li>
+                ))}
+              </ol>
+            ) : (
               <div className="mt-4 space-y-4">
                 <p className="text-sm leading-6 text-muted-foreground">
                   This expanded-catalog recipe is sourced externally, so Rasoi
@@ -232,13 +234,49 @@ function RecipeDetailContent() {
                   </Button>
                 )}
               </div>
-            ) : (
-              <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm leading-7">
-                {steps.map((s) => (
-                  <li key={s.step}>{s.text}</li>
-                ))}
-              </ol>
             )}
+            {recipe.source_url && (
+              <div className="mt-6 pt-4 border-t border-border">
+                <p className="text-xs text-muted-foreground">
+                  Recipe sourced from{" "}
+                  <a
+                    href={recipe.source_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    {sourceHost ?? "original source"}
+                  </a>
+                </p>
+              </div>
+            )}
+          </section>
+        </div>
+
+        <aside className="space-y-4">
+          <section className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
+            <div className="flex items-center gap-2 font-semibold">
+              <Clock className="h-4 w-4 text-primary" />
+              Quick Info
+            </div>
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Prep time</span>
+                <span className="font-medium">{recipe.prep_time_min} min</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Difficulty</span>
+                <span className="font-medium capitalize">{recipe.difficulty}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Region</span>
+                <span className="font-medium capitalize">{recipe.region.replace("_", " ")}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Type</span>
+                <span className="font-medium capitalize">{recipe.meal_type}</span>
+              </div>
+            </div>
           </section>
         </aside>
       </section>
