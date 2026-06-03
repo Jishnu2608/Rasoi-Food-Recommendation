@@ -59,7 +59,7 @@ export function Footer() {
 
           <div>
             <h2 className="mt-4 font-semibold">Connect</h2>
-            <div className="mt-2 flex gap-4">
+            <div className="mt-2 flex items-center gap-4 pt-1 text-muted-foreground">
               <a
                 href="https://github.com/Jishnu2608/"
                 target="_blank"
