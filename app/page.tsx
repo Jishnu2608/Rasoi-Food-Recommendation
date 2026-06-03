@@ -13,6 +13,7 @@ import {
   Star,
 } from "lucide-react";
 import { IngredientInput } from "@/components/ingredients/ingredient-input";
+import { RecipeSubmissionForm } from "@/components/contact/recipe-submission-form";
 
 const sampleIngredients = ["aloo", "pyaz", "tamatar", "dahi", "chawal", "anda"];
 
@@ -262,6 +263,8 @@ export default function HomePage() {
           </div>
         ))}
       </section>
+
+      <RecipeSubmissionForm />
     </div>
   );
 }
