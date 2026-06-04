@@ -8,7 +8,6 @@ import {
   Clock,
   CookingPot,
   Leaf,
-  Search,
   Sparkles,
   Star,
 } from "lucide-react";
@@ -250,7 +249,7 @@ export default function HomePage() {
         </section>
       )}
 
-      <section className="grid gap-3 md:grid-cols-3">
+      {/* <section className="grid gap-3 md:grid-cols-3">
         {[
           ["Normalize", "Hindi, English, regional names, and fuzzy spellings."],
           ["Rank", "Uses pantry overlap, missing items, prep time, and staples."],
@@ -262,7 +261,7 @@ export default function HomePage() {
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{text}</p>
           </div>
         ))}
-      </section>
+      </section> */}
 
       <RecipeSubmissionForm />
     </div>

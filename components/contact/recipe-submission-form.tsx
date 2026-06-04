@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Send, ClipboardPen } from "lucide-react";
 
 export function RecipeSubmissionForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,7 +82,8 @@ export function RecipeSubmissionForm() {
 
   return (
     <div className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
-      <h3 className="text-lg font-semibold">Submit Your Recipe</h3>
+      <ClipboardPen className="h-4 w-4 text-primary" />
+      <h3 className="mt-3 text-lg font-semibold">Submit Your Recipe</h3>
       <p className="mt-2 text-sm text-muted-foreground">
         Found a recipe that&apos;s not in our app? Share it with us!
       </p>
