@@ -3,7 +3,13 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Loader2, SearchX, ShoppingBasket } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  SearchX,
+  ShoppingBasket,
+} from "lucide-react";
 import { RecipeCard } from "@/components/recipes/recipe-card";
 import type {
   IngredientRef,
@@ -53,10 +59,17 @@ function RecommendContent() {
         setResults(data.results ?? []);
         sessionStorage.setItem(
           "rasoi:lastSearch",
-          JSON.stringify({ ingredients, pantry: data.pantry, results: data.results }),
+          JSON.stringify({
+            ingredients,
+            pantry: data.pantry,
+            results: data.results,
+          }),
         );
 
-        if (process.env.NEXT_PUBLIC_AI_ENABLED === "true" && data.results?.length) {
+        if (
+          process.env.NEXT_PUBLIC_AI_ENABLED === "true" &&
+          data.results?.length
+        ) {
           const aiRes = await fetch("/api/ai/explain", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -88,10 +101,10 @@ function RecommendContent() {
 
   if (loading) {
     return (
-      <div className="grid min-h-[420px] place-items-center rounded-[2rem] border border-border bg-card/90">
+      <div className="premium-panel grid min-h-[320px] place-items-center">
         <div className="flex items-center gap-3 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin text-primary" />
-          Matching recipes from your pantry...
+          <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden />
+          Matching recipes from your pantry…
         </div>
       </div>
     );
@@ -99,7 +112,7 @@ function RecommendContent() {
 
   if (error) {
     return (
-      <div className="rounded-[2rem] border border-border bg-card p-6 shadow-sm">
+      <div className="premium-panel p-6">
         <p className="text-destructive">{error}</p>
         <Button variant="outline" asChild className="mt-4">
           <Link href="/">Back home</Link>
@@ -109,34 +122,38 @@ function RecommendContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-[2rem] border border-border bg-card p-5 shadow-sm sm:p-6">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
-        <div className="relative flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+    <div className="rasoi-page space-y-6">
+      <section className="premium-panel p-5 sm:p-6">
+        <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-4">
             <Button variant="ghost" size="sm" asChild className="-ml-2">
               <Link href="/">
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4" aria-hidden />
                 Change ingredients
               </Link>
             </Button>
             <div>
-              <p className="text-sm font-medium text-primary">Rasoi ranked your pantry</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+              <p className="text-sm font-semibold text-primary">
+                Rasoi ranked your pantry
+              </p>
+              <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                 Aaj ke liye yeh dishes
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                {results.length} matches from {pantry.length} recognized ingredients
+                {results.length} matches from {pantry.length} recognized
+                ingredients
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               {pantry.map((p) => (
-                <Badge key={p.id} variant="secondary" className="bg-background">
+                <Badge key={p.id} variant="outline">
                   {p.display_name_en}
                 </Badge>
               ))}
               {pantry.length === 0 && (
-                <span className="text-sm text-muted-foreground">No recognized pantry items</span>
+                <span className="text-sm text-muted-foreground">
+                  No recognized pantry items
+                </span>
               )}
             </div>
             {unmatched.length > 0 && (
@@ -146,13 +163,15 @@ function RecommendContent() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:min-w-72">
-            <div className="rounded-[1.25rem] border border-border bg-background/85 p-4">
-              <p className="text-3xl font-semibold text-primary">{readyCount}</p>
+          <div className="grid min-w-0 grid-cols-2 gap-3 sm:min-w-56">
+            <div className="surface-inset rounded-xl border border-border p-4">
+              <p className="text-2xl font-semibold text-primary">{readyCount}</p>
               <p className="text-xs text-muted-foreground">ready now</p>
             </div>
-            <div className="rounded-[1.25rem] border border-border bg-background/85 p-4">
-              <p className="text-3xl font-semibold text-primary">{results.length}</p>
+            <div className="surface-inset rounded-xl border border-border p-4">
+              <p className="text-2xl font-semibold text-primary">
+                {results.length}
+              </p>
               <p className="text-xs text-muted-foreground">ranked ideas</p>
             </div>
           </div>
@@ -160,15 +179,18 @@ function RecommendContent() {
       </section>
 
       {explanation && (
-        <div className="rounded-[1.5rem] border border-border bg-secondary/45 p-4 text-sm leading-6 shadow-sm">
+        <div className="premium-card bg-secondary/50 p-4 text-sm leading-6 text-foreground">
           {explanation}
         </div>
       )}
 
       {results.length === 0 ? (
-        <div className="rounded-[2rem] border border-dashed border-border bg-muted/45 p-8 text-center">
-          <SearchX className="mx-auto h-8 w-8 text-primary" />
-          <h2 className="mt-3 font-semibold">No recipe match yet</h2>
+        <div className="premium-panel border-dashed p-8 text-center">
+          <SearchX
+            className="mx-auto h-8 w-8 text-primary"
+            aria-hidden
+          />
+          <h2 className="mt-3 font-semibold text-foreground">No recipe match yet</h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
             Try a common pantry item like aloo, rice, dahi, egg, onion, tomato,
             or besan.
@@ -178,7 +200,7 @@ function RecommendContent() {
         <>
           {readyCount > 0 && (
             <div className="flex items-center gap-2 text-sm font-medium text-success">
-              <CheckCircle2 className="h-4 w-4" />
+              <CheckCircle2 className="h-4 w-4" aria-hidden />
               Ready dishes are shown first, then close matches.
             </div>
           )}
@@ -192,8 +214,8 @@ function RecommendContent() {
         </>
       )}
 
-      <div className="flex items-center gap-2 rounded-[1.25rem] border border-border bg-card/85 px-4 py-3 text-sm text-muted-foreground">
-        <ShoppingBasket className="h-4 w-4 text-primary" />
+      <div className="premium-card flex items-center gap-2 px-4 py-3 text-sm text-muted-foreground">
+        <ShoppingBasket className="h-4 w-4 shrink-0 text-primary" aria-hidden />
         Missing items are shown so you can decide whether to substitute or skip.
       </div>
     </div>
@@ -202,7 +224,14 @@ function RecommendContent() {
 
 export default function RecommendPage() {
   return (
-    <Suspense fallback={<p className="text-muted-foreground">Loading...</p>}>
+    <Suspense
+      fallback={
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+          Loading…
+        </div>
+      }
+    >
       <RecommendContent />
     </Suspense>
   );

@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, ClipboardPen } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Send, ClipboardPen, CheckCircle2 } from "lucide-react";
+
+const fieldClass =
+  "w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 export function RecipeSubmissionForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,138 +53,159 @@ export function RecipeSubmissionForm() {
 
   if (submitted) {
     return (
-      <div className="rounded-[1.5rem] border border-border bg-card/90 p-5 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-          <svg
-            className="h-6 w-6 text-green-600 dark:text-green-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+      <div className="premium-panel p-6 text-center">
+        <div className="relative z-10">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-success-muted text-success">
+            <CheckCircle2 className="h-7 w-7" aria-hidden />
+          </div>
+          <h3 className="text-xl font-semibold text-foreground">
+            Recipe submitted
+          </h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Thank you for sharing your recipe. We&apos;ll review it and add it
+            to our collection.
+          </p>
+          <Button
+            onClick={() => setSubmitted(false)}
+            variant="outline"
+            className="mt-4"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
+            Submit Another Recipe
+          </Button>
         </div>
-        <h3 className="text-lg font-semibold">Recipe Submitted!</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Thank you for sharing your recipe. We&apos;ll review it and add it to our collection.
-        </p>
-        <Button
-          onClick={() => setSubmitted(false)}
-          variant="outline"
-          className="mt-4"
-        >
-          Submit Another Recipe
-        </Button>
       </div>
     );
   }
 
   return (
-    <div className="rounded-[1.5rem] border border-border bg-card/90 p-5 shadow-sm">
-      <ClipboardPen className="h-4 w-4 text-primary" />
-      <h3 className="mt-3 text-lg font-semibold">Submit Your Recipe</h3>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Found a recipe that&apos;s not in our app? Share it with us!
-      </p>
-
-      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+    <section className="premium-panel p-5 sm:p-7">
+      <div className="relative z-10 grid gap-7 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
         <div>
-          <label htmlFor="recipeName" className="mb-1.5 block text-sm font-medium">
-            Recipe Name *
-          </label>
-          <input
-            type="text"
-            id="recipeName"
-            required
-            value={formData.recipeName}
-            onChange={(e) => setFormData({ ...formData, recipeName: e.target.value })}
-            className="w-full rounded-2xl border border-border bg-background/80 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-            placeholder="e.g., Maa ki Dal"
-          />
+          <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/12 text-primary">
+            <ClipboardPen className="h-5 w-5" aria-hidden />
+          </div>
+          <p className="mt-4 text-sm font-semibold text-primary">
+            Community pantry
+          </p>
+          <h3 className="mt-1 text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-3xl">
+            Know a dish Rasoi missed?
+          </h3>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Send the recipe name, ingredients, and steps. It lands in the
+            owner&apos;s inbox as a review-ready submission.
+          </p>
         </div>
 
-        <div>
-          <label htmlFor="ingredients" className="mb-1.5 block text-sm font-medium">
-            Ingredients *
-          </label>
-          <textarea
-            id="ingredients"
-            required
-            rows={4}
-            value={formData.ingredients}
-            onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
-            className="w-full rounded-2xl border border-border bg-background/80 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
-            placeholder="List all ingredients with quantities (e.g., 1 cup rice, 2 onions, 1 tsp cumin)"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="instructions" className="mb-1.5 block text-sm font-medium">
-            Cooking Instructions *
-          </label>
-          <textarea
-            id="instructions"
-            required
-            rows={4}
-            value={formData.instructions}
-            onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-            className="w-full rounded-2xl border border-border bg-background/80 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary resize-none"
-            placeholder="Describe the cooking steps in order"
-          />
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="yourName" className="mb-1.5 block text-sm font-medium">
-              Your Name *
+            <label
+              htmlFor="recipeName"
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
+              Recipe Name *
             </label>
-            <input
-              type="text"
-              id="yourName"
+            <Input
+              id="recipeName"
               required
-              value={formData.yourName}
-              onChange={(e) => setFormData({ ...formData, yourName: e.target.value })}
-              className="w-full rounded-2xl border border-border bg-background/80 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="Your name"
+              value={formData.recipeName}
+              onChange={(e) =>
+                setFormData({ ...formData, recipeName: e.target.value })
+              }
+              placeholder="e.g., Maa ki Dal"
             />
           </div>
 
           <div>
-            <label htmlFor="yourEmail" className="mb-1.5 block text-sm font-medium">
-              Your Email *
+            <label
+              htmlFor="ingredients"
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
+              Ingredients *
             </label>
-            <input
-              type="email"
-              id="yourEmail"
+            <textarea
+              id="ingredients"
               required
-              value={formData.yourEmail}
-              onChange={(e) => setFormData({ ...formData, yourEmail: e.target.value })}
-              className="w-full rounded-2xl border border-border bg-background/80 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="your@email.com"
+              rows={4}
+              value={formData.ingredients}
+              onChange={(e) =>
+                setFormData({ ...formData, ingredients: e.target.value })
+              }
+              className={`${fieldClass} min-h-28 resize-y`}
+              placeholder="List all ingredients with quantities"
             />
           </div>
-        </div>
 
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full"
-        >
-          {isSubmitting ? (
-            "Submitting..."
-          ) : (
-            <>
-              Submit Recipe
-              <Send className="ml-2 h-4 w-4" />
-            </>
-          )}
-        </Button>
-      </form>
-    </div>
+          <div>
+            <label
+              htmlFor="instructions"
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
+              Cooking Instructions *
+            </label>
+            <textarea
+              id="instructions"
+              required
+              rows={4}
+              value={formData.instructions}
+              onChange={(e) =>
+                setFormData({ ...formData, instructions: e.target.value })
+              }
+              className={`${fieldClass} min-h-28 resize-y`}
+              placeholder="Describe the cooking steps in order"
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="yourName"
+                className="mb-1.5 block text-sm font-medium text-foreground"
+              >
+                Your Name *
+              </label>
+              <Input
+                id="yourName"
+                required
+                value={formData.yourName}
+                onChange={(e) =>
+                  setFormData({ ...formData, yourName: e.target.value })
+                }
+                placeholder="Your name"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="yourEmail"
+                className="mb-1.5 block text-sm font-medium text-foreground"
+              >
+                Your Email *
+              </label>
+              <Input
+                id="yourEmail"
+                type="email"
+                required
+                value={formData.yourEmail}
+                onChange={(e) =>
+                  setFormData({ ...formData, yourEmail: e.target.value })
+                }
+                placeholder="your@email.com"
+              />
+            </div>
+          </div>
+
+          <Button type="submit" disabled={isSubmitting} className="w-full">
+            {isSubmitting ? (
+              "Submitting…"
+            ) : (
+              <>
+                Submit Recipe
+                <Send className="h-4 w-4" aria-hidden />
+              </>
+            )}
+          </Button>
+        </form>
+      </div>
+    </section>
   );
 }

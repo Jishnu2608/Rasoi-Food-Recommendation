@@ -25,6 +25,12 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 1.75rem;
+  --radius-3xl: 2rem;
   --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
 }
@@ -32,101 +38,93 @@
 :root {
   color-scheme: light;
 
-  /* Base */
-  --background: #f8f6f1;
-  --foreground: #31372f;
-
-  /* Cards */
-  --card: #fdfcf8;
-  --card-foreground: #31372f;
-
-  /* Brand */
-  --primary: #d97706;
+  --background: #f7f1e7;
+  --foreground: #2e342d;
+  --card: #fffaf0;
+  --card-foreground: #2e342d;
+  --primary: #c96f25;
   --primary-foreground: #ffffff;
-
-  /* Secondary */
-  --secondary: #e6ece3;
-  --secondary-foreground: #445144;
-
-  /* Muted */
-  --muted: #eef1eb;
-  --muted-foreground: #69736b;
-
-  /* Accent */
-  --accent: #eab308;
+  --secondary: #e7ebdc;
+  --secondary-foreground: #3d4b3e;
+  --muted: #ece5d7;
+  --muted-foreground: #746d5f;
+  --accent: #d9a222;
   --accent-foreground: #2f342d;
-
-  /* Strong */
-  --strong: #3b4339;
+  --strong: #354236;
   --strong-foreground: #ffffff;
-
-  /* Success */
-  --success: #6b8f71;
+  --success: #5a7d60;
   --success-foreground: #ffffff;
   --success-muted: #e9f1ea;
-
-  /* Warning */
-  --warning: #c98b1d;
+  --warning: #a66f12;
   --warning-muted: #fbf2dc;
-
-  /* Error */
-  --destructive: #c65d4b;
+  --destructive: #b54a3a;
   --destructive-muted: #fae7e3;
+  --border: #dfd4bf;
+  --input: #dfd4bf;
+  --ring: #c96f25;
 
-  /* Borders */
-  --border: #d9e0d5;
-  --input: #d9e0d5;
-  --ring: #d97706;
+  --surface-elevated: color-mix(in oklab, var(--card) 92%, var(--background));
+  --surface-inset: color-mix(in oklab, var(--background) 88%, var(--muted));
+  --surface-glass: color-mix(in oklab, var(--card) 78%, transparent);
+  --overlay-on-strong: rgba(255, 255, 255, 0.12);
+  --overlay-highlight: rgba(255, 255, 255, 0.2);
+  --shadow-header: 0 1px 0 var(--border), 0 8px 24px color-mix(in oklab, var(--foreground) 6%, transparent);
+  --shadow-card: 0 2px 8px color-mix(in oklab, var(--foreground) 5%, transparent),
+    0 12px 32px color-mix(in oklab, var(--foreground) 7%, transparent);
+  --shadow-card-hover: 0 4px 12px color-mix(in oklab, var(--foreground) 6%, transparent),
+    0 20px 48px color-mix(in oklab, var(--foreground) 10%, transparent);
+  --shadow-soft: var(--shadow-card);
+  --shadow-lift: var(--shadow-card-hover);
+  --shadow-primary: 0 8px 24px color-mix(in oklab, var(--primary) 28%, transparent);
+  --grain-opacity: 0.35;
+  --bg-glow-primary: color-mix(in oklab, var(--primary) 14%, transparent);
+  --bg-glow-accent: color-mix(in oklab, var(--accent) 10%, transparent);
+  --bg-glow-success: color-mix(in oklab, var(--success) 12%, transparent);
 }
 
 .dark {
   color-scheme: dark;
 
-  /* Base */
   --background: #151a16;
   --foreground: #f3f1eb;
-
-  /* Cards */
   --card: #1d241f;
   --card-foreground: #f3f1eb;
-
-  /* Brand */
   --primary: #f0a54a;
   --primary-foreground: #1d241f;
-
-  /* Secondary */
   --secondary: #2a342d;
   --secondary-foreground: #dfe8de;
-
-  /* Muted */
   --muted: #232b26;
   --muted-foreground: #aab5ad;
-
-  /* Accent */
   --accent: #f4c95d;
   --accent-foreground: #1d241f;
-
-  /* Strong */
   --strong: #313b34;
   --strong-foreground: #f3f1eb;
-
-  /* Success */
   --success: #8db08f;
   --success-foreground: #132016;
   --success-muted: #243026;
-
-  /* Warning */
   --warning: #e3b05a;
   --warning-muted: #3a3321;
-
-  /* Error */
   --destructive: #e08b80;
   --destructive-muted: #39211f;
-
-  /* Borders */
   --border: #323d35;
   --input: #323d35;
   --ring: #f0a54a;
+
+  --surface-elevated: color-mix(in oklab, var(--card) 94%, var(--background));
+  --surface-inset: color-mix(in oklab, var(--background) 90%, var(--muted));
+  --surface-glass: color-mix(in oklab, var(--card) 82%, transparent);
+  --overlay-on-strong: rgba(255, 255, 255, 0.1);
+  --overlay-highlight: rgba(255, 255, 255, 0.08);
+  --shadow-header: 0 1px 0 var(--border), 0 8px 28px rgba(0, 0, 0, 0.28);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.18), 0 12px 36px rgba(0, 0, 0, 0.22);
+  --shadow-card-hover: 0 4px 14px rgba(0, 0, 0, 0.22), 0 22px 52px rgba(0, 0, 0, 0.32);
+  --shadow-soft: var(--shadow-card);
+  --shadow-lift: var(--shadow-card-hover);
+  --shadow-primary: 0 8px 28px color-mix(in oklab, var(--primary) 22%, transparent);
+  --grain-opacity: 0.18;
+  --bg-glow-primary: color-mix(in oklab, var(--primary) 10%, transparent);
+  --bg-glow-accent: color-mix(in oklab, var(--accent) 8%, transparent);
+  --bg-glow-success: color-mix(in oklab, var(--success) 8%, transparent);
 }
 
 html {
@@ -136,56 +134,213 @@ html {
 body {
   background: var(--background);
   background-image:
-    radial-gradient(
-      circle at 15% 0%,
-      rgba(234, 179, 8, 0.10),
-      transparent 28rem
-    ),
-    radial-gradient(
-      circle at 90% 10%,
-      rgba(217, 119, 6, 0.08),
-      transparent 24rem
-    ),
-    radial-gradient(
-      circle at 50% 100%,
-      rgba(107, 143, 113, 0.08),
-      transparent 32rem
-    ),
-    linear-gradient(
-      180deg,
-      rgba(253,252,248,0.96),
-      rgba(248,246,241,1)
-    );
-
+    radial-gradient(circle at 8% 12%, var(--bg-glow-success), transparent 26rem),
+    radial-gradient(circle at 90% 8%, var(--bg-glow-primary), transparent 24rem),
+    radial-gradient(circle at 50% 100%, var(--bg-glow-accent), transparent 32rem);
   color: var(--foreground);
   font-family: var(--font-sans);
-}
-
-.dark body {
-  background-image:
-    radial-gradient(
-      circle at 15% 0%,
-      rgba(244, 201, 93, 0.08),
-      transparent 28rem
-    ),
-    radial-gradient(
-      circle at 90% 10%,
-      rgba(240, 165, 74, 0.07),
-      transparent 24rem
-    ),
-    radial-gradient(
-      circle at 50% 100%,
-      rgba(141, 176, 143, 0.05),
-      transparent 32rem
-    ),
-    linear-gradient(
-      180deg,
-      rgba(21,26,22,0.98),
-      rgba(17,21,18,1)
-    );
+  overflow-x: hidden;
 }
 
 ::selection {
-  background: rgba(217, 119, 6, 0.22);
+  background: color-mix(in oklab, var(--primary) 28%, transparent);
   color: inherit;
+}
+
+/* Subtle texture — no blend-mode thrash */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: repeating-linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--foreground) 2.5%, transparent) 0,
+    color-mix(in oklab, var(--foreground) 2.5%, transparent) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+}
+
+@keyframes rasoi-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.rasoi-page {
+  animation: rasoi-fade-up 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.premium-shell {
+  position: relative;
+}
+
+.premium-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-3xl);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-soft);
+}
+
+.premium-panel > .relative.z-10,
+.premium-panel > .relative {
+  position: relative;
+  z-index: 1;
+}
+
+.premium-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms ease;
+}
+
+@media (hover: hover) {
+  .premium-card:hover {
+    transform: translate3d(0, -3px, 0);
+    border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+.surface-glass {
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+}
+
+.surface-inset {
+  background: var(--surface-inset);
+}
+
+.chip-on-strong {
+  border-radius: 999px;
+  background: var(--overlay-on-strong);
+  color: var(--strong-foreground);
+}
+
+.stat-on-strong {
+  border-radius: var(--radius-lg);
+  background: var(--overlay-on-strong);
+  padding: 0.75rem;
+}
+
+.soft-button {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+}
+
+@media (hover: hover) {
+  .soft-button:hover {
+    transform: translate3d(0, -1px, 0);
+    box-shadow: var(--shadow-primary);
+  }
+
+  .soft-button:active {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.kinetic-chip {
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+@media (hover: hover) {
+  .kinetic-chip:hover {
+    border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+  }
+}
+
+.match-meter {
+  transform-origin: left center;
+  transition: width 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: width;
+}
+
+.alive-dot {
+  background: var(--success);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--success) 30%, transparent);
+}
+
+.method-steps {
+  counter-reset: recipe-step;
+}
+
+.method-step {
+  position: relative;
+  counter-increment: recipe-step;
+}
+
+.method-step::before {
+  content: counter(recipe-step);
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  display: grid;
+  height: 1.75rem;
+  width: 1.75rem;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* Decorative orbs — static, GPU-cheap */
+.hero-orb {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklab, var(--accent) 28%, transparent),
+    color-mix(in oklab, var(--success) 18%, transparent)
+  );
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.dark .hero-orb {
+  opacity: 0.35;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+
+  .rasoi-page {
+    animation: none;
+  }
+
+  .premium-card:hover,
+  .soft-button:hover {
+    transform: none;
+  }
 }
